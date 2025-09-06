@@ -1,0 +1,19 @@
+{
+  "name": "lanchonete-pdv",
+  "version": "1.0.0",
+  "description": "Sistema de PDV para lanchonete",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^31.0.1"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "sqlite3": "^5.1.7"
+  }
+}
