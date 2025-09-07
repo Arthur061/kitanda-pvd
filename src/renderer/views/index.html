@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <title>Kitanda - Café e Lanches</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="background-logo"></div>
+    <div class="container">
+        <div class="sidebar" id="categorias">
+            <h2>Categorias</h2>
+            <button id="manage-products-btn" class="categoria-btn" style="background-color: #795548; color: white;">
+                Gerir Produtos
+            </button>
+            <div id="category-buttons-container">
+                <button class="categoria-btn">Todos</button>
+                <button class="categoria-btn">Lanches</button>
+                <button class="categoria-btn">Bebidas</button>
+                <button class="categoria-btn">Combos</button>
+                <button class="categoria-btn">Outros</button>
+            </div>
+        </div>
+        <div class="main-content" id="produtos"></div>
+        <div class="sidebar" id="pedido">
+            <h2>Pedido Atual</h2>
+            <ul id="lista-pedido"></ul>
+            <div class="total">
+                <strong>Total:</strong>
+                <span id="valor-total">R$ 0,00</span>
+            </div>
+            <button class="btn-finalizar">Finalizar Venda</button>
+        </div>
+    </div>
+
+    <div id="payment-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2>Finalizar Venda</h2>
+            <p>Total do Pedido: <strong id="modal-total">R$ 0,00</strong></p>
+            <div class="payment-options">
+                <h3>Selecione o Meio de Pagamento:</h3>
+                <button class="payment-btn" data-method="Dinheiro">Dinheiro</button>
+                <button class="payment-btn" data-method="Pix">Pix</button>
+                <button class="payment-btn" data-method="Crédito">Crédito</button>
+                <button class="payment-btn" data-method="Débito">Débito</button>
+            </div>
+            <p>Pagamento Selecionado: <strong id="selected-payment">-</strong></p>
+            <div class="modal-actions">
+                <button id="cancel-sale-btn" class="btn-cancel">Cancelar</button>
+                <button id="confirm-sale-btn" class="btn-confirm" disabled>Confirmar Compra</button>
+            </div>
+        </div>
+    </div>
+    <script src="../js/renderer.js"></script>
+</body>
+</html>
