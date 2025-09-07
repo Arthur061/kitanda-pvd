@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Kitanda - Registar Nova Conta</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/login.css" /> </head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <h1>Criar Conta na Kitanda</h1>
+            <p>Preencha os dados abaixo</p>
+            <form id="register-form">
+                <div class="input-group">
+                    <label for="username">Nome de Utilizador</label>
+                    <input type="text" id="username" name="username" required />
+                </div>
+                <div class="input-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" name="password" required />
+                </div>
+                <div class="input-group">
+                    <label for="confirm-password">Confirmar Senha</label>
+                    <input type="password" id="confirm-password" name="confirm-password" required />
+                </div>
+                <button type="submit" class="btn-login">Registar</button>
+            </form>
+            <div id="message" class="message"></div> <p class="register-link">Já tem uma conta? <a href="#" id="go-to-login">Faça login aqui</a></p>
+        </div>
+    </div>
+
+    <script src="../js/register.js"></script>
+</body>
+</html>
