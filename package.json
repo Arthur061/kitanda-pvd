@@ -2,7 +2,7 @@
   "name": "lanchonete-pdv",
   "version": "1.0.0",
   "description": "Sistema de PDV para lanchonete",
-  "main": "main.js",
+  "main": "src/main/main.js",
   "scripts": {
     "start": "electron ."
   },
