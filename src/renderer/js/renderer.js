@@ -1,9 +1,8 @@
-// --- Seletores de Elementos do DOM ---
+// src/renderer/js/renderer.js (VERSÃO RESTAURADA)
 const produtosDiv = document.getElementById('produtos');
 const listaPedidoUl = document.getElementById('lista-pedido');
 const valorTotalSpan = document.getElementById('valor-total');
 const manageProductsBtn = document.getElementById('manage-products-btn');
-// Adicionamos o seletor para o container dos botões de categoria
 const categoryButtonsContainer = document.getElementById('category-buttons-container');
 const finalizarVendaBtn = document.querySelector('.btn-finalizar');
 const paymentModal = document.getElementById('payment-modal');
@@ -13,31 +12,32 @@ const selectedPaymentDisplay = document.getElementById('selected-payment');
 const cancelSaleBtn = document.getElementById('cancel-sale-btn');
 const confirmSaleBtn = document.getElementById('confirm-sale-btn');
 
-// --- Variáveis de Estado da Aplicação ---
 let pedidoAtual = [];
 let todosOsProdutos = [];
 let selectedPaymentMethod = null;
 
-
-// --- Funções ---
-
-/**
- * Carrega os produtos do banco de dados e configura os eventos iniciais.
- */
 async function carregarDadosIniciais() {
     try {
-        todosOsProdutos = await window.api.getProducts();
-        // A chamada para renderizar o dropdown foi REMOVIDA
+        const user = await window.api.getCurrentUser();
+        if (user && user.role === 'admin' && !document.getElementById('open-management-btn')) {
+            const adminButton = document.createElement('button');
+            adminButton.id = 'open-management-btn';
+            adminButton.className = 'categoria-btn';
+            adminButton.innerText = 'Gerenciamento';
+            adminButton.addEventListener('click', () => {
+                window.api.openManagementWindow();
+            });
+            manageProductsBtn.insertAdjacentElement('afterend', adminButton);
+        }
+
+        const produtosDoBanco = await window.api.getProducts();
+        todosOsProdutos = produtosDoBanco.filter(produto => produto.stock > 0);
         filtrarProdutosPorCategoria('Todos');
     } catch (error) {
         console.error("Erro ao carregar dados iniciais:", error);
     }
 }
 
-
-/**
- * Filtra os produtos com base na categoria clicada.
- */
 function filtrarProdutosPorCategoria(categoria) {
     produtosDiv.innerHTML = '';
     const produtosFiltrados = (categoria.toLowerCase() === 'todos')
@@ -53,17 +53,18 @@ function filtrarProdutosPorCategoria(categoria) {
     });
 }
 
-/**
- * Adiciona um produto ao pedido atual e atualiza a exibição.
- */
 function adicionarAoPedido(produto) {
-    pedidoAtual.push(produto);
-    renderizarPedido();
+    const estoqueAtual = todosOsProdutos.find(p => p.id === produto.id)?.stock || 0;
+    const quantidadeNoPedido = pedidoAtual.filter(p => p.id === produto.id).length;
+
+    if (quantidadeNoPedido < estoqueAtual) {
+        pedidoAtual.push(produto);
+        renderizarPedido();
+    } else {
+        alert(`Não há mais estoque disponível para "${produto.name}".`);
+    }
 }
 
-/**
- * Atualiza a lista de itens e o valor total na barra lateral do pedido.
- */
 function renderizarPedido() {
     listaPedidoUl.innerHTML = '';
     let total = 0;
@@ -78,9 +79,6 @@ function renderizarPedido() {
     modalTotal.innerText = totalFormatado;
 }
 
-/**
- * Reseta o modal de pagamento para o estado inicial.
- */
 function resetPaymentModal() {
     selectedPaymentMethod = null;
     selectedPaymentDisplay.innerText = '-';
@@ -88,30 +86,18 @@ function resetPaymentModal() {
     confirmSaleBtn.disabled = true;
 }
 
-
-// Evento para o botão "Gerir Produtos"
 manageProductsBtn.addEventListener('click', () => {
     window.api.openProductsWindow();
 });
 
-// Adiciona eventos de clique para os novos botões de categoria
-
-// 1. Seleciona todos os botões de categoria dentro do container
 const botoesDeCategoria = categoryButtonsContainer.querySelectorAll('.categoria-btn');
-
-// 2. Adiciona um "ouvinte" de clique para cada um deles
 botoesDeCategoria.forEach(botao => {
     botao.addEventListener('click', () => {
-        // 3. Pega o texto do botão clicado (ex: "Lanches")
         const categoriaClicada = botao.innerText;
-        
-        // 4. Chama a função de filtro com a categoria
         filtrarProdutosPorCategoria(categoriaClicada);
     });
 });
 
-
-// Evento para abrir o modal de pagamento
 finalizarVendaBtn.addEventListener('click', () => {
     if (pedidoAtual.length === 0) {
         alert('Adicione itens ao pedido antes de finalizar!');
@@ -120,13 +106,11 @@ finalizarVendaBtn.addEventListener('click', () => {
     paymentModal.classList.remove('hidden');
 });
 
-// Evento para fechar o modal
 cancelSaleBtn.addEventListener('click', () => {
     paymentModal.classList.add('hidden');
     resetPaymentModal();
 });
 
-// Eventos para selecionar o método de pagamento
 paymentOptions.forEach(button => {
     button.addEventListener('click', () => {
         paymentOptions.forEach(btn => btn.classList.remove('selected'));
@@ -137,16 +121,13 @@ paymentOptions.forEach(button => {
     });
 });
 
-// Evento para confirmar e finalizar a venda
 confirmSaleBtn.addEventListener('click', async () => {
     const saleData = {
         items: pedidoAtual,
         total: pedidoAtual.reduce((sum, item) => sum + item.price, 0),
         paymentMethod: selectedPaymentMethod
     };
-
     const result = await window.api.finalizeSale(saleData);
-
     if (result.success) {
         alert('Venda finalizada com sucesso!');
         pedidoAtual = [];
@@ -159,5 +140,4 @@ confirmSaleBtn.addEventListener('click', async () => {
     }
 });
 
-// --- Inicialização da Página ---
 carregarDadosIniciais();

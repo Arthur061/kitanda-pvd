@@ -1,24 +1,24 @@
+// src/main/main.js (VERSÃO RESTAURADA)
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('node:path');
 const bcrypt = require('bcrypt');
 const { initDb, getDb } = require('./database.js');
 
 let currentWindow;
-
-// --- FUNÇÕES DE CRIAÇÃO DE JANELAS ---
+let currentUser;
 
 const createMainWindow = () => {
   currentWindow = new BrowserWindow({
     width: 1200,
     height: 800,
-    icon: path.join(__dirname, '../../assets/icon.ico'), // CORRIGIDO
+    icon: path.join(__dirname, '../../assets/icon.ico'),
     webPreferences: {
-      preload: path.join(__dirname, '../preload/preload.js'), // CORRIGIDO
+      preload: path.join(__dirname, '../preload/preload.js'),
     },
   });
   currentWindow.maximize();
   currentWindow.setMenu(null);
-  currentWindow.loadFile(path.join(__dirname, '../renderer/views/index.html')); // CORRIGIDO
+  currentWindow.loadFile(path.join(__dirname, '../renderer/views/index.html'));
 };
 
 const createLoginWindow = () => {
@@ -26,13 +26,13 @@ const createLoginWindow = () => {
     width: 500,
     height: 650,
     resizable: false,
-    icon: path.join(__dirname, '../../assets/icon.ico'), // CORRIGIDO
+    icon: path.join(__dirname, '../../assets/icon.ico'),
     webPreferences: {
-      preload: path.join(__dirname, '../preload/preload.js'), // CORRIGIDO
+      preload: path.join(__dirname, '../preload/preload.js'),
     },
   });
   currentWindow.setMenu(null);
-  currentWindow.loadFile(path.join(__dirname, '../renderer/views/login.html')); // CORRIGIDO
+  currentWindow.loadFile(path.join(__dirname, '../renderer/views/login.html'));
 };
 
 const createRegisterWindow = () => {
@@ -40,13 +40,13 @@ const createRegisterWindow = () => {
     width: 500,
     height: 650,
     resizable: false,
-    icon: path.join(__dirname, '../../assets/icon.ico'), // CORRIGIDO
+    icon: path.join(__dirname, '../../assets/icon.ico'),
     webPreferences: {
-      preload: path.join(__dirname, '../preload/preload.js'), // CORRIGIDO
+      preload: path.join(__dirname, '../preload/preload.js'),
     },
   });
   currentWindow.setMenu(null);
-  currentWindow.loadFile(path.join(__dirname, '../renderer/views/register.html')); // CORRIGIDO
+  currentWindow.loadFile(path.join(__dirname, '../renderer/views/register.html'));
 };
 
 const createProductsWindow = () => {
@@ -55,21 +55,33 @@ const createProductsWindow = () => {
     height: 700,
     parent: currentWindow,
     modal: true,
-    icon: path.join(__dirname, '../../assets/icon.ico'), // CORRIGIDO
+    icon: path.join(__dirname, '../../assets/icon.ico'),
     webPreferences: {
-      preload: path.join(__dirname, '../preload/preload.js'), // CORRIGIDO
+      preload: path.join(__dirname, '../preload/preload.js'),
     },
   });
   productsWindow.setMenu(null);
-  productsWindow.loadFile(path.join(__dirname, '../renderer/views/produtos.html')); // CORRIGIDO
+  productsWindow.loadFile(path.join(__dirname, '../renderer/views/produtos.html'));
 };
 
-// --- INICIALIZAÇÃO DA APLICAÇÃO ---
+const createManagementWindow = () => {
+  const managementWindow = new BrowserWindow({
+    width: 1200,
+    height: 800,
+    parent: currentWindow,
+    modal: true,
+    icon: path.join(__dirname, '../../assets/icon.ico'),
+    webPreferences: {
+      preload: path.join(__dirname, '../preload/preload.js'),
+    },
+  });
+  managementWindow.setMenu(null);
+  managementWindow.loadFile(path.join(__dirname, '../renderer/views/gerenciamento.html'));
+};
 
 app.whenReady().then(() => {
   initDb();
   createLoginWindow();
-
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createLoginWindow();
   });
@@ -79,10 +91,10 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
-
 ipcMain.on('navigate:to-register', () => { currentWindow.close(); createRegisterWindow(); });
 ipcMain.on('navigate:to-login', () => { currentWindow.close(); createLoginWindow(); });
 ipcMain.on('open-products-window', createProductsWindow);
+ipcMain.on('open-management-window', createManagementWindow);
 
 ipcMain.handle('login:submit', async (event, username, password) => {
     const db = getDb();
@@ -96,15 +108,10 @@ ipcMain.handle('login:submit', async (event, username, password) => {
             } else {
                 const passwordIsValid = bcrypt.compareSync(password, user.password);
                 if (passwordIsValid) {
+                    currentUser = { username: user.username, role: user.role };
                     createMainWindow();
                     BrowserWindow.fromWebContents(event.sender).close();
-                    resolve({ 
-                        success: true, 
-                        user: { 
-                            username: user.username, 
-                            role: user.role 
-                        } 
-                    });
+                    resolve({ success: true, user: { username: user.username, role: user.role } });
                 } else {
                     resolve({ success: false, message: 'Senha incorreta.' });
                 }
@@ -113,12 +120,15 @@ ipcMain.handle('login:submit', async (event, username, password) => {
     });
 });
 
+ipcMain.handle('auth:get-current-user', () => {
+  return currentUser;
+});
+
 ipcMain.handle('register:submit', async (event, username, password) => {
   const db = getDb();
     return new Promise((resolve) => {
         const salt = bcrypt.genSaltSync(10);
         const hashedPassword = bcrypt.hashSync(password, salt);
-        
         const sql = 'INSERT INTO users (username, password) VALUES (?, ?)';
         db.run(sql, [username, hashedPassword], function (err) {
         if (err) {
@@ -148,16 +158,13 @@ ipcMain.handle('products:add', async (event, product) => {
         });
     });
 });
+
 ipcMain.handle('products:get', async () => {
   const db = getDb();
     return new Promise((resolve) => {
         const sql = 'SELECT * FROM products ORDER BY name';
         db.all(sql, [], (err, rows) => {
-            if (err) {
-                resolve([]);
-            } else {
-                resolve(rows);
-            }
+            if (err) { resolve([]); } else { resolve(rows); }
         });
     });
 });
@@ -165,12 +172,7 @@ ipcMain.handle('products:get', async () => {
 ipcMain.handle('categories:get', async () => {
   const db = getDb();
     return new Promise((resolve) => {
-        const sql = `
-            SELECT DISTINCT category 
-            FROM products 
-            WHERE category IS NOT NULL AND category != '' 
-            ORDER BY category
-        `;
+        const sql = `SELECT DISTINCT category FROM products WHERE category IS NOT NULL AND category != '' ORDER BY category`;
         db.all(sql, [], (err, rows) => {
             if (err) {
                 console.error("Erro ao buscar categorias:", err);
@@ -182,33 +184,24 @@ ipcMain.handle('categories:get', async () => {
     });
 });
 
-// --- NOVA FUNÇÃO PARA PROCESSAR A VENDA ---
-
 ipcMain.handle('sale:finalize', async (event, saleData) => {
   const db = getDb();
   const { items, total, paymentMethod } = saleData;
-
   return new Promise((resolve) => {
     db.serialize(() => {
-      // Inicia uma transação para garantir que tudo aconteça ou nada aconteça
       db.run('BEGIN TRANSACTION;');
-
       const saleSql = 'INSERT INTO sales (total, payment_method) VALUES (?, ?)';
       db.run(saleSql, [total, paymentMethod], function (err) {
         if (err) {
           db.run('ROLLBACK;');
           return resolve({ success: false, message: err.message });
         }
-
         const saleId = this.lastID;
         const itemsPromises = items.map(item => {
           return new Promise((itemResolve, itemReject) => {
             const itemSql = 'INSERT INTO sale_items (sale_id, product_id, quantity, price) VALUES (?, ?, ?, ?)';
-            // Estamos a vender 1 unidade de cada item clicado
             db.run(itemSql, [saleId, item.id, 1, item.price], function (itemErr) {
               if (itemErr) return itemReject(itemErr);
-
-              // Atualiza o estoque do produto
               const stockSql = 'UPDATE products SET stock = stock - 1 WHERE id = ?';
               db.run(stockSql, [item.id], function (stockErr) {
                 if (stockErr) return itemReject(stockErr);
@@ -217,7 +210,6 @@ ipcMain.handle('sale:finalize', async (event, saleData) => {
             });
           });
         });
-
         Promise.all(itemsPromises)
           .then(() => {
             db.run('COMMIT;');
@@ -228,6 +220,26 @@ ipcMain.handle('sale:finalize', async (event, saleData) => {
             resolve({ success: false, message: transactionErr.message });
           });
       });
+    });
+  });
+});
+
+ipcMain.handle('reports:get-sales-by-date', async (event, date) => {
+  const db = getDb();
+  return new Promise((resolve) => {
+    const sql = `SELECT total, payment_method FROM sales WHERE date(created_at) = ?`;
+    db.all(sql, [date], (err, rows) => {
+        if (err) { resolve([]); } else { resolve(rows); }
+    });
+  });
+});
+
+ipcMain.handle('reports:get-products-to-restock', async () => {
+  const db = getDb();
+  return new Promise((resolve) => {
+    const sql = 'SELECT * FROM products WHERE stock <= min_stock ORDER BY stock ASC';
+    db.all(sql, [], (err, rows) => {
+      if (err) { resolve([]); } else { resolve(rows); }
     });
   });
 });
