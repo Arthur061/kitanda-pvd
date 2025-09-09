@@ -343,3 +343,59 @@ h2 {
     color: white;
     border-color: #e91e63;
 }
+
+/* --- ESTILOS PARA O ACORDEÃO DE RELATÓRIOS --- */
+
+.payment-accordion {
+    margin-top: 15px;
+}
+
+.payment-method-group {
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    overflow: hidden; /* Garante que o conteúdo não vaze durante a animação */
+}
+
+.payment-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    cursor: pointer;
+    background-color: #f9f9f9;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.payment-summary:hover {
+    background-color: #f0f0f0;
+}
+
+.payment-summary .arrow {
+    font-size: 1.2em;
+    transition: transform 0.3s ease;
+}
+
+.sales-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background-color: #ffffff;
+    padding: 0 15px;
+}
+
+.sale-record {
+    padding: 15px 0;
+    border-bottom: 1px dashed #ccc;
+}
+
+.sale-record:last-child {
+    border-bottom: none;
+}
+
+.sale-record ul {
+    list-style-position: inside;
+    padding-left: 10px;
+    margin-top: 5px;
+}

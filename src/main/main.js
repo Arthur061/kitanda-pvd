@@ -1,4 +1,3 @@
-// src/main/main.js (VERSÃO COM ORDEM ALFABÉTICA)
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('node:path');
 const bcrypt = require('bcrypt');
@@ -276,12 +275,51 @@ ipcMain.handle('sale:finalize', async (event, saleData) => {
   });
 });
 
+// <<<<<<<<<<<<<<< INÍCIO DA MODIFICAÇÃO >>>>>>>>>>>>>>>>>
 ipcMain.handle('reports:get-sales-by-date', async (event, date) => {
   const db = getDb();
   return new Promise((resolve) => {
-    const sql = `SELECT total, payment_method FROM sales WHERE date(created_at) = ?`;
+    const sql = `
+      SELECT
+        s.id as sale_id,
+        s.total as sale_total,
+        s.payment_method,
+        s.created_at,
+        p.name as product_name,
+        si.price as item_price
+      FROM sales s
+      JOIN sale_items si ON s.id = si.sale_id
+      JOIN products p ON si.product_id = p.id
+      WHERE date(s.created_at) = ?
+      ORDER BY s.created_at DESC;
+    `;
     db.all(sql, [date], (err, rows) => {
-        if (err) { resolve([]); } else { resolve(rows); }
+      if (err) {
+        console.error("Erro ao buscar relatório de vendas detalhado:", err);
+        return resolve([]);
+      }
+      
+      // Agrupa os itens de produto dentro de cada venda
+      const salesById = {};
+      rows.forEach(row => {
+        if (!salesById[row.sale_id]) {
+          salesById[row.sale_id] = {
+            id: row.sale_id,
+            total: row.sale_total,
+            paymentMethod: row.payment_method,
+            createdAt: row.created_at,
+            items: []
+          };
+        }
+        salesById[row.sale_id].items.push({
+          name: row.product_name,
+          price: row.item_price
+        });
+      });
+
+      // Converte o objeto de volta para um array
+      const detailedSales = Object.values(salesById);
+      resolve(detailedSales);
     });
   });
 });

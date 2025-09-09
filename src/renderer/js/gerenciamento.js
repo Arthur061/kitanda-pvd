@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadSalesReport(date) {
         salesReportDiv.innerHTML = '<p>Carregando...</p>';
+        // A API agora retorna os detalhes completos de cada venda
         const sales = await window.api.getSalesByDate(date);
 
         if (sales.length === 0) {
@@ -12,25 +13,53 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        let total = 0;
+        let grandTotal = 0;
+        // Agrupa as vendas completas por método de pagamento
         const salesByPaymentMethod = sales.reduce((acc, sale) => {
-            if (!acc[sale.payment_method]) {
-                acc[sale.payment_method] = 0;
+            const method = sale.paymentMethod;
+            if (!acc[method]) {
+                acc[method] = {
+                    total: 0,
+                    salesList: []
+                };
             }
-            acc[sale.payment_method] += sale.total;
-            total += sale.total;
+            acc[method].total += sale.total;
+            acc[method].salesList.push(sale);
+            grandTotal += sale.total;
             return acc;
         }, {});
 
-        let reportHtml = `
-            <p><strong>Total de Vendas: R$ ${total.toFixed(2)}</strong></p>
-            <h4>Vendas por Forma de Pagamento:</h4>
-            <ul>
-        `;
+        // Monta o HTML do relatório
+        let reportHtml = `<p><strong>Total de Vendas: R$ ${grandTotal.toFixed(2)}</strong></p><h4>Vendas por Forma de Pagamento:</h4>`;
+        
+        reportHtml += '<div class="payment-accordion">';
         for (const method in salesByPaymentMethod) {
-            reportHtml += `<li>${method}: R$ ${salesByPaymentMethod[method].toFixed(2)}</li>`;
+            const group = salesByPaymentMethod[method];
+            reportHtml += `
+                <div class="payment-method-group">
+                    <div class="payment-summary">
+                        <span>${method}: R$ ${group.total.toFixed(2)}</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="sales-details">
+            `;
+
+            group.salesList.forEach(sale => {
+                const saleTime = new Date(sale.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                reportHtml += `
+                    <div class="sale-record">
+                        <p><strong>Venda de ${saleTime} - Total: R$ ${sale.total.toFixed(2)}</strong></p>
+                        <ul>
+                `;
+                sale.items.forEach(item => {
+                    reportHtml += `<li>${item.name} - R$ ${item.price.toFixed(2)}</li>`;
+                });
+                reportHtml += `</ul></div>`;
+            });
+
+            reportHtml += `</div></div>`;
         }
-        reportHtml += '</ul>';
+        reportHtml += '</div>';
         salesReportDiv.innerHTML = reportHtml;
     }
 
@@ -54,6 +83,26 @@ document.addEventListener('DOMContentLoaded', () => {
     salesDatePicker.addEventListener('change', (e) => {
         if (e.target.value) {
             loadSalesReport(e.target.value);
+        }
+    });
+
+    // Adiciona o event listener para o "acordeão"
+    salesReportDiv.addEventListener('click', (e) => {
+        const header = e.target.closest('.payment-summary');
+        if (header) {
+            const group = header.parentElement;
+            const details = group.querySelector('.sales-details');
+            const arrow = header.querySelector('.arrow');
+
+            group.classList.toggle('active');
+            
+            if (group.classList.contains('active')) {
+                details.style.maxHeight = details.scrollHeight + "px";
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                details.style.maxHeight = null;
+                arrow.style.transform = 'rotate(0deg)';
+            }
         }
     });
 
