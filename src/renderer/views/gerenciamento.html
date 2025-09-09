@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Kitanda - Gerenciamento</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <style>
+        .management-section {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .management-section h3 {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+<body class="produtos-page">
+    <div class="container">
+        <div class="main-content" style="display: block;">
+            <h2>Relatórios de Gerenciamento</h2>
+
+            <div class="management-section">
+                <h3>Movimentação de Caixa por Data</h3>
+                <div class="input-group">
+                    <label for="sales-date-picker">Selecione uma data:</label>
+                    <input type="date" id="sales-date-picker" style="max-width: 200px;">
+                </div>
+                <div id="sales-report"></div>
+            </div>
+
+            <div class="management-section">
+                <h3>Produtos com Baixo Estoque (Precisam de Reposição)</h3>
+                <div id="restock-report"></div>
+            </div>
+        </div>
+    </div>
+    <script src="../js/gerenciamento.js"></script>
+</body>
+</html>
