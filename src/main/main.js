@@ -1,4 +1,4 @@
-// src/main/main.js (VERSÃO FINAL CORRIGIDA)
+// src/main/main.js (VERSÃO COM ORDEM ALFABÉTICA)
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('node:path');
 const bcrypt = require('bcrypt');
@@ -102,11 +102,11 @@ app.on('window-all-closed', () => {
 
 // Navegação entre janelas de login/registro
 ipcMain.on('navigate:to-register', (event) => {
-    BrowserWindow.fromWebContents(event.sender)?.close(); // CORRIGIDO
+    BrowserWindow.fromWebContents(event.sender)?.close();
     createRegisterWindow();
 });
 ipcMain.on('navigate:to-login', (event) => {
-    BrowserWindow.fromWebContents(event.sender)?.close(); // CORRIGIDO
+    BrowserWindow.fromWebContents(event.sender)?.close();
     createLoginWindow();
 });
 
@@ -136,7 +136,7 @@ ipcMain.handle('login:submit', async (event, username, password) => {
             if (passwordIsValid) {
                 currentUser = { username: user.username, role: user.role };
                 createMainWindow();
-                BrowserWindow.fromWebContents(event.sender)?.close(); // CORRIGIDO
+                BrowserWindow.fromWebContents(event.sender)?.close();
                 resolve({ success: true, user: currentUser });
             } else {
                 resolve({ success: false, message: 'Senha incorreta.' });
@@ -147,7 +147,6 @@ ipcMain.handle('login:submit', async (event, username, password) => {
 
 ipcMain.handle('auth:get-current-user', () => currentUser);
 
-// ... (o restante do arquivo permanece exatamente o mesmo)
 ipcMain.handle('register:submit', async (event, username, password) => {
   const db = getDb();
     return new Promise((resolve) => {
@@ -186,7 +185,7 @@ ipcMain.handle('products:add', async (event, product) => {
 ipcMain.handle('products:get', async () => {
   const db = getDb();
     return new Promise((resolve) => {
-        const sql = 'SELECT * FROM products ORDER BY name';
+        const sql = 'SELECT * FROM products ORDER BY name COLLATE NOCASE';
         db.all(sql, [], (err, rows) => {
             if (err) { resolve([]); } else { resolve(rows); }
         });

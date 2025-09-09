@@ -314,3 +314,32 @@ h2 {
 .btn-delete:hover {
     background-color: #c82333;
 }
+
+/* --- AJUSTES NA LISTA DE PEDIDO --- */
+#lista-pedido li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 5px;
+    border-bottom: 1px dashed #ddd;
+}
+
+.btn-remove-item {
+    background-color: #fce4ec; /* Rosa bem claro */
+    color: #ad1457; /* Rosa escuro */
+    border: 1px solid #f8bbd0;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 22px; /* Alinha o "x" verticalmente */
+    text-align: center;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-remove-item:hover {
+    background-color: #e91e63; /* Rosa */
+    color: white;
+    border-color: #e91e63;
+}

@@ -1,4 +1,4 @@
-// src/renderer/js/renderer.js (VERSÃO RESTAURADA)
+// src/renderer/js/renderer.js (VERSÃO COM OPÇÃO DE REMOVER ITEM)
 const produtosDiv = document.getElementById('produtos');
 const listaPedidoUl = document.getElementById('lista-pedido');
 const valorTotalSpan = document.getElementById('valor-total');
@@ -68,12 +68,18 @@ function adicionarAoPedido(produto) {
 function renderizarPedido() {
     listaPedidoUl.innerHTML = '';
     let total = 0;
-    pedidoAtual.forEach(item => {
+    
+    // Atualizado para incluir o botão de remoção com o índice do item
+    pedidoAtual.forEach((item, index) => {
         const li = document.createElement('li');
-        li.innerText = `${item.name} - R$ ${item.price.toFixed(2)}`;
+        li.innerHTML = `
+            <span>${item.name} - R$ ${item.price.toFixed(2)}</span>
+            <button class="btn-remove-item" data-index="${index}" title="Remover item">x</button>
+        `;
         listaPedidoUl.appendChild(li);
         total += item.price;
     });
+
     const totalFormatado = `R$ ${total.toFixed(2)}`;
     valorTotalSpan.innerText = totalFormatado;
     modalTotal.innerText = totalFormatado;
@@ -85,6 +91,8 @@ function resetPaymentModal() {
     paymentOptions.forEach(btn => btn.classList.remove('selected'));
     confirmSaleBtn.disabled = true;
 }
+
+// --- EVENT LISTENERS ---
 
 manageProductsBtn.addEventListener('click', () => {
     window.api.openProductsWindow();
@@ -134,12 +142,26 @@ confirmSaleBtn.addEventListener('click', async () => {
         renderizarPedido();
         paymentModal.classList.add('hidden');
         resetPaymentModal();
-        carregarDadosIniciais();
+        carregarDadosIniciais(); // Recarrega os produtos para atualizar o estoque
     } else {
         alert(`Erro ao finalizar a venda: ${result.message}`);
     }
 });
 
+// Event listener para remover itens do pedido
+listaPedidoUl.addEventListener('click', (e) => {
+    // Verifica se o elemento clicado é o botão de remover
+    if (e.target.classList.contains('btn-remove-item')) {
+        const indexToRemove = parseInt(e.target.dataset.index, 10);
+        
+        pedidoAtual.splice(indexToRemove, 1);
+        
+        renderizarPedido();
+    }
+});
+
+
+// --- CARREGAMENTO INICIAL E ATUALIZAÇÕES ---
 window.api.onProductsUpdate(() => {
     console.log('Recebida notificação para atualizar produtos.');
     carregarDadosIniciais();
