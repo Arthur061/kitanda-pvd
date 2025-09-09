@@ -1,14 +1,15 @@
-// src/main/main.js (VERSÃO RESTAURADA)
+// src/main/main.js (VERSÃO FINAL CORRIGIDA)
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('node:path');
 const bcrypt = require('bcrypt');
 const { initDb, getDb } = require('./database.js');
 
-let currentWindow;
+// Variável para manter a referência da janela principal
+let mainWindow;
 let currentUser;
 
 const createMainWindow = () => {
-  currentWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     icon: path.join(__dirname, '../../assets/icon.ico'),
@@ -16,13 +17,18 @@ const createMainWindow = () => {
       preload: path.join(__dirname, '../preload/preload.js'),
     },
   });
-  currentWindow.maximize();
-  currentWindow.setMenu(null);
-  currentWindow.loadFile(path.join(__dirname, '../renderer/views/index.html'));
+  mainWindow.maximize();
+  mainWindow.setMenu(null);
+  mainWindow.loadFile(path.join(__dirname, '../renderer/views/index.html'));
+
+  // Garante que a referência seja limpa quando a janela for fechada
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
 };
 
 const createLoginWindow = () => {
-  currentWindow = new BrowserWindow({
+  const loginWindow = new BrowserWindow({
     width: 500,
     height: 650,
     resizable: false,
@@ -31,12 +37,12 @@ const createLoginWindow = () => {
       preload: path.join(__dirname, '../preload/preload.js'),
     },
   });
-  currentWindow.setMenu(null);
-  currentWindow.loadFile(path.join(__dirname, '../renderer/views/login.html'));
+  loginWindow.setMenu(null);
+  loginWindow.loadFile(path.join(__dirname, '../renderer/views/login.html'));
 };
 
 const createRegisterWindow = () => {
-  currentWindow = new BrowserWindow({
+  const registerWindow = new BrowserWindow({
     width: 500,
     height: 650,
     resizable: false,
@@ -45,15 +51,15 @@ const createRegisterWindow = () => {
       preload: path.join(__dirname, '../preload/preload.js'),
     },
   });
-  currentWindow.setMenu(null);
-  currentWindow.loadFile(path.join(__dirname, '../renderer/views/register.html'));
+  registerWindow.setMenu(null);
+  registerWindow.loadFile(path.join(__dirname, '../renderer/views/register.html'));
 };
 
 const createProductsWindow = () => {
   const productsWindow = new BrowserWindow({
     width: 900,
     height: 700,
-    parent: currentWindow,
+    parent: mainWindow, // A janela principal é sempre o "pai"
     modal: true,
     icon: path.join(__dirname, '../../assets/icon.ico'),
     webPreferences: {
@@ -68,7 +74,7 @@ const createManagementWindow = () => {
   const managementWindow = new BrowserWindow({
     width: 1200,
     height: 800,
-    parent: currentWindow,
+    parent: mainWindow, // A janela principal é sempre o "pai"
     modal: true,
     icon: path.join(__dirname, '../../assets/icon.ico'),
     webPreferences: {
@@ -91,39 +97,57 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
-ipcMain.on('navigate:to-register', () => { currentWindow.close(); createRegisterWindow(); });
-ipcMain.on('navigate:to-login', () => { currentWindow.close(); createLoginWindow(); });
+
+// --- IPC Listeners ---
+
+// Navegação entre janelas de login/registro
+ipcMain.on('navigate:to-register', (event) => {
+    BrowserWindow.fromWebContents(event.sender)?.close(); // CORRIGIDO
+    createRegisterWindow();
+});
+ipcMain.on('navigate:to-login', (event) => {
+    BrowserWindow.fromWebContents(event.sender)?.close(); // CORRIGIDO
+    createLoginWindow();
+});
+
+// Abertura de janelas modais a partir da principal
 ipcMain.on('open-products-window', createProductsWindow);
 ipcMain.on('open-management-window', createManagementWindow);
 
+// Comunicação para atualização de dados
+ipcMain.on('products-changed', () => {
+    // Envia o evento de atualização apenas para a `mainWindow` se ela existir
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('update-products-list');
+    }
+});
+
+
+// Handlers de banco de dados
 ipcMain.handle('login:submit', async (event, username, password) => {
     const db = getDb();
     return new Promise((resolve) => {
         const sql = 'SELECT * FROM users WHERE username = ?';
         db.get(sql, [username], (err, user) => {
-            if (err) {
-                resolve({ success: false, message: 'Erro no banco de dados.' });
-            } else if (!user) {
-                resolve({ success: false, message: 'Utilizador não encontrado.' });
+            if (err) return resolve({ success: false, message: 'Erro no banco de dados.' });
+            if (!user) return resolve({ success: false, message: 'Utilizador não encontrado.' });
+
+            const passwordIsValid = bcrypt.compareSync(password, user.password);
+            if (passwordIsValid) {
+                currentUser = { username: user.username, role: user.role };
+                createMainWindow();
+                BrowserWindow.fromWebContents(event.sender)?.close(); // CORRIGIDO
+                resolve({ success: true, user: currentUser });
             } else {
-                const passwordIsValid = bcrypt.compareSync(password, user.password);
-                if (passwordIsValid) {
-                    currentUser = { username: user.username, role: user.role };
-                    createMainWindow();
-                    BrowserWindow.fromWebContents(event.sender).close();
-                    resolve({ success: true, user: { username: user.username, role: user.role } });
-                } else {
-                    resolve({ success: false, message: 'Senha incorreta.' });
-                }
+                resolve({ success: false, message: 'Senha incorreta.' });
             }
         });
     });
 });
 
-ipcMain.handle('auth:get-current-user', () => {
-  return currentUser;
-});
+ipcMain.handle('auth:get-current-user', () => currentUser);
 
+// ... (o restante do arquivo permanece exatamente o mesmo)
 ipcMain.handle('register:submit', async (event, username, password) => {
   const db = getDb();
     return new Promise((resolve) => {
@@ -165,6 +189,35 @@ ipcMain.handle('products:get', async () => {
         const sql = 'SELECT * FROM products ORDER BY name';
         db.all(sql, [], (err, rows) => {
             if (err) { resolve([]); } else { resolve(rows); }
+        });
+    });
+});
+
+ipcMain.handle('products:update', async (event, { id, product }) => {
+    const db = getDb();
+    return new Promise((resolve) => {
+        const { name, price, stock, category, min_stock } = product;
+        const sql = 'UPDATE products SET name = ?, price = ?, stock = ?, category = ?, min_stock = ? WHERE id = ?';
+        db.run(sql, [name, price, stock, category, min_stock, id], function(err) {
+            if (err) {
+                resolve({ success: false, message: err.message });
+            } else {
+                resolve({ success: true });
+            }
+        });
+    });
+});
+
+ipcMain.handle('products:delete', async (event, id) => {
+    const db = getDb();
+    return new Promise((resolve) => {
+        const sql = 'DELETE FROM products WHERE id = ?';
+        db.run(sql, [id], function(err) {
+            if (err) {
+                resolve({ success: false, message: err.message });
+            } else {
+                resolve({ success: true });
+            }
         });
     });
 });

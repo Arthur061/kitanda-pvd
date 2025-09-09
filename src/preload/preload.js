@@ -1,4 +1,4 @@
-// src/preload/preload.js (VERSÃO RESTAURADA)
+// src/preload/preload.js (VERSÃO COM COMUNICAÇÃO)
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
@@ -16,6 +16,8 @@ contextBridge.exposeInMainWorld('api', {
   // Funções de Produtos
   getProducts: () => ipcRenderer.invoke('products:get'),
   addProduct: (product) => ipcRenderer.invoke('products:add', product),
+  updateProduct: (id, product) => ipcRenderer.invoke('products:update', { id, product }),
+  deleteProduct: (id) => ipcRenderer.invoke('products:delete', id),
   
   // Funções de Categorias
   getCategories: () => ipcRenderer.invoke('categories:get'),
@@ -26,4 +28,8 @@ contextBridge.exposeInMainWorld('api', {
   // Funções de Relatórios
   getSalesByDate: (date) => ipcRenderer.invoke('reports:get-sales-by-date', date),
   getProductsToRestock: () => ipcRenderer.invoke('reports:get-products-to-restock'),
+
+  // Comunicação entre janelas
+  notifyProductsChanged: () => ipcRenderer.send('products-changed'),
+  onProductsUpdate: (callback) => ipcRenderer.on('update-products-list', callback)
 });

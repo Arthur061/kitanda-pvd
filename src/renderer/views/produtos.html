@@ -46,12 +46,47 @@
                         <th>Estoque</th>
                         <th>Estoque Mín.</th>
                         <th>Categoria</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody id="product-list"></tbody>
             </table>
         </div>
     </div>
+
+    <div id="edit-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2>Editar Produto</h2>
+            <form id="edit-product-form">
+                <input type="hidden" id="edit-id" />
+                <div class="input-group">
+                    <label for="edit-name">Nome do Produto</label>
+                    <input type="text" id="edit-name" required />
+                </div>
+                <div class="input-group">
+                    <label for="edit-price">Preço</label>
+                    <input type="number" step="0.01" id="edit-price" required />
+                </div>
+                <div class="input-group">
+                    <label for="edit-stock">Estoque</label>
+                    <input type="number" id="edit-stock" required />
+                </div>
+                <div class="input-group">
+                    <label for="edit-min_stock">Estoque Mínimo</label>
+                    <input type="number" id="edit-min_stock" required />
+                </div>
+                <div class="input-group">
+                    <label for="edit-category-select">Categoria</label>
+                    <select id="edit-category-select" required></select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="cancel-edit-btn" class="btn-cancel">Cancelar</button>
+                    <button type="submit" class="btn-confirm">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="../js/produtos.js"></script>
 </body>
 </html>

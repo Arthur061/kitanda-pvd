@@ -140,4 +140,9 @@ confirmSaleBtn.addEventListener('click', async () => {
     }
 });
 
+window.api.onProductsUpdate(() => {
+    console.log('Recebida notificação para atualizar produtos.');
+    carregarDadosIniciais();
+});
+
 carregarDadosIniciais();
