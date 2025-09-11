@@ -4,16 +4,37 @@
   "description": "Sistema de PDV para lanchonete",
   "main": "src/main/main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^31.0.1"
+    "electron": "^31.0.1",
+    "electron-builder": "^24.13.3"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
     "sqlite3": "^5.1.7"
+  },
+  "build": {
+    "appId": "com.kitanda.pdv",
+    "productName": "Kitanda PDV",
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
   }
 }
