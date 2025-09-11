@@ -1,4 +1,3 @@
-// src/renderer/js/produtos.js (VERSÃO COM EDIÇÃO E EXCLUSÃO)
 const productForm = document.getElementById('product-form');
 const productList = document.getElementById('product-list');
 const formMessage = document.getElementById('form-message');
@@ -11,7 +10,7 @@ const cancelEditBtn = document.getElementById('cancel-edit-btn');
 const editCategorySelect = document.getElementById('edit-category-select');
 
 const categoriasPadrao = ["Lanches", "Bebidas", "Combos", "Outros"];
-let allProducts = []; // Armazena todos os produtos carregados
+let allProducts = []; 
 
 // --- FUNÇÕES DE RENDERIZAÇÃO ---
 
@@ -78,7 +77,7 @@ productForm.addEventListener('submit', async (e) => {
         formMessage.style.color = 'green';
         productForm.reset();
         window.api.notifyProductsChanged();
-        await initializePage(); // Recarrega tudo
+        await initializePage();
     } else {
         formMessage.innerText = `Erro: ${result.message}`;
         formMessage.style.color = 'red';
@@ -113,7 +112,7 @@ editProductForm.addEventListener('submit', async (e) => {
     if (result.success) {
         closeEditModal();
         window.api.notifyProductsChanged();
-        await initializePage(); // Recarrega tudo
+        await initializePage(); 
     } else {
         alert(`Erro ao atualizar produto: ${result.message}`);
     }

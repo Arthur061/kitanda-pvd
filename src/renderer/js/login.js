@@ -18,8 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Adiciona o evento de clique para navegar para a página de registo
     const goToRegisterLink = document.getElementById('go-to-register');
     goToRegisterLink.addEventListener('click', (e) => {
-        e.preventDefault(); // Impede o comportamento padrão do link
-        window.api.goToRegister(); // Chama a função exposta no preload
+        e.preventDefault(); 
+        window.api.goToRegister();
     });
     
 });

@@ -58,7 +58,7 @@ const createProductsWindow = () => {
   const productsWindow = new BrowserWindow({
     width: 900,
     height: 700,
-    parent: mainWindow, // A janela principal é sempre o "pai"
+    parent: mainWindow,
     modal: true,
     icon: path.join(__dirname, '../../assets/icon.ico'),
     webPreferences: {
@@ -73,7 +73,7 @@ const createManagementWindow = () => {
   const managementWindow = new BrowserWindow({
     width: 1200,
     height: 800,
-    parent: mainWindow, // A janela principal é sempre o "pai"
+    parent: mainWindow, 
     modal: true,
     icon: path.join(__dirname, '../../assets/icon.ico'),
     webPreferences: {
@@ -115,7 +115,6 @@ ipcMain.on('open-management-window', createManagementWindow);
 
 // Comunicação para atualização de dados
 ipcMain.on('products-changed', () => {
-    // Envia o evento de atualização apenas para a `mainWindow` se ela existir
     if (mainWindow && !mainWindow.isDestroyed()) {
         mainWindow.webContents.send('update-products-list');
     }
@@ -317,7 +316,6 @@ ipcMain.handle('reports:get-sales-by-date', async (event, date) => {
         });
       });
 
-      // Converte o objeto de volta para um array
       const detailedSales = Object.values(salesById);
       resolve(detailedSales);
     });

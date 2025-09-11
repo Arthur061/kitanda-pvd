@@ -1,4 +1,3 @@
-// src/renderer/js/renderer.js (VERSÃO COM OPÇÃO DE REMOVER ITEM)
 const produtosDiv = document.getElementById('produtos');
 const listaPedidoUl = document.getElementById('lista-pedido');
 const valorTotalSpan = document.getElementById('valor-total');
@@ -142,7 +141,7 @@ confirmSaleBtn.addEventListener('click', async () => {
         renderizarPedido();
         paymentModal.classList.add('hidden');
         resetPaymentModal();
-        carregarDadosIniciais(); // Recarrega os produtos para atualizar o estoque
+        carregarDadosIniciais(); 
     } else {
         alert(`Erro ao finalizar a venda: ${result.message}`);
     }

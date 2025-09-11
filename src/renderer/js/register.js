@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    document.body.classList.add('login-page'); // Reutiliza o fundo da página de login
+    document.body.classList.add('login-page'); 
 
     const registerForm = document.getElementById('register-form');
     const messageDiv = document.getElementById('message');
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = registerForm.password.value;
         const confirmPassword = registerForm['confirm-password'].value;
         messageDiv.innerText = '';
-        messageDiv.style.color = '#d32f2f'; // Cor de erro padrão
+        messageDiv.style.color = '#d32f2f'; 
 
         // Validação no frontend
         if (password.length < 4) {
@@ -28,9 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const result = await window.api.register(username, password);
 
         if (result.success) {
-            messageDiv.style.color = '#28a745'; // Cor de sucesso
+            messageDiv.style.color = '#28a745'; 
             messageDiv.innerText = result.message;
-            registerForm.reset(); // Limpa o formulário
+            registerForm.reset();
         } else {
             messageDiv.innerText = result.message;
         }

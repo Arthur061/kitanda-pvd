@@ -1,11 +1,9 @@
-// src/main/database.js (VERSÃO CORRIGIDA)
-
 const { app } = require('electron');
 const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcrypt');
 const path = require('path');
 
-let db; // A variável do banco fica aqui, mas será inicializada depois
+let db; 
 
 const initDb = () => {
   // A criação do caminho e a conexão com o banco foram movidas para DENTRO desta função
@@ -65,11 +63,11 @@ const initDb = () => {
     `);
 
     // Lógica para criar o usuário 'admin' e garantir que ele tenha a role 'admin'
-    const adminUser = 'admin';
+    const adminUser = 'kitanda';
     db.get('SELECT * FROM users WHERE username = ?', [adminUser], (err, row) => {
       if (!row) {
         const salt = bcrypt.genSaltSync(10);
-        const hashedPassword = bcrypt.hashSync('1234', salt);
+        const hashedPassword = bcrypt.hashSync('kitanda2025', salt);
         db.run('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', [adminUser, hashedPassword, 'admin'], (insertErr) => {
           if (!insertErr) {
             console.log('Banco de dados inicializado. Usuário "admin" criado com senha "1234".');
@@ -82,7 +80,6 @@ const initDb = () => {
   });
 };
 
-// Agora vamos exportar uma função para obter a instância do banco
 const getDb = () => db;
 
 module.exports = { initDb, getDb };
