@@ -21,6 +21,7 @@
   "build": {
     "appId": "com.kitanda.pdv",
     "productName": "Kitanda PDV",
+    "npmRebuild": true,
     "files": [
       "src/**/*",
       "assets/**/*",
