@@ -31,12 +31,16 @@ document.addEventListener('DOMContentLoaded', () => {
             messageDiv.style.color = '#28a745'; 
             messageDiv.innerText = result.message;
             registerForm.reset();
+
+            setTimeout(() => {
+                window.api.goToLogin();
+            }, 1500); 
+
         } else {
             messageDiv.innerText = result.message;
         }
     });
 
-    // Adiciona o evento de clique para voltar ao login
     goToLoginLink.addEventListener('click', (e) => {
         e.preventDefault();
         window.api.goToLogin();
