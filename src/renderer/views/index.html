@@ -10,16 +10,25 @@
     <div class="background-logo"></div>
     <div class="container">
         <div class="sidebar" id="categorias">
-            <h2>Categorias</h2>
-            <button id="manage-products-btn" class="categoria-btn" style="background-color: #795548; color: white;">
-                Gerir Produtos
+            <button id="category-toggle-btn" class="accordion-header collapsed">
+                <span style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1.2em;">📂</span> Categorias
+                </span>
+                <span class="arrow">▼</span>
             </button>
-            <div id="category-buttons-container">
-                <button class="categoria-btn">Todos</button>
+            
+            <div id="category-buttons-container" class="accordion-content">
+                <button class="categoria-btn selected">Todos</button>
                 <button class="categoria-btn">Lanches</button>
                 <button class="categoria-btn">Bebidas</button>
                 <button class="categoria-btn">Combos</button>
                 <button class="categoria-btn">Outros</button>
+            </div>
+
+            <div class="sidebar-footer">
+                <button id="manage-products-btn" class="action-btn">
+                    ⚙️ Gerenciar Estoque
+                </button>
             </div>
         </div>
         <div class="main-content" id="produtos"></div>
@@ -46,6 +55,15 @@
                 <button class="payment-btn" data-method="Débito">Débito</button>
             </div>
             <p>Pagamento Selecionado: <strong id="selected-payment">-</strong></p>
+            <div id="alert-modal" class="modal-overlay hidden">
+                <div class="modal-content">
+                    <h2 id="alert-tittle" style="margin-bottom: 15px">Atenção</h2>
+                    <p id ="alert-message" style="front-size: 1.1em; margin-bottom: 20px;"></p>
+                    <div class="modal-actions" style="justify-content: center;">
+                        <button id="alert-ok-btn" class="btn-confirm" style="width: 100%;">Entendi</button>
+                    </div>
+                </div>
+            </div>
             <div class="modal-actions">
                 <button id="cancel-sale-btn" class="btn-cancel">Cancelar</button>
                 <button id="confirm-sale-btn" class="btn-confirm" disabled>Confirmar Compra</button>
