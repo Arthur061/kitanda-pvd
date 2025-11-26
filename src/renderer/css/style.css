@@ -39,22 +39,135 @@ body {
     width: 100%;
 }
 
-/* Colunas laterais (Categorias e Pedido) */
+/* --- SIDEBAR E MENU (ESTILO MODERNO) --- */
 .sidebar {
-    padding: 20px;
     background-color: #fff;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    box-shadow: 2px 0 10px rgba(0,0,0,0.05);
     display: flex;
     flex-direction: column;
+    z-index: 10;
+    height: 100%;
 }
 
 #categorias {
-    width: 200px;
+    width: 220px; /* Um pouco mais largo para o menu */
 }
 
 #pedido {
     width: 300px;
+    padding: 20px; /* Mantém padding só no pedido */
 }
+
+/* Cabeçalho do Menu */
+.accordion-header {
+    width: 100%;
+    padding: 18px 20px;
+    background-color: #5d4037; /* Marrom Kitanda */
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1em;
+    font-weight: 600;
+    transition: background-color 0.3s;
+    border-bottom: 1px solid #4e342e;
+}
+
+.accordion-header:hover {
+    background-color: #4e342e;
+}
+
+/* Animação da Seta */
+.accordion-header .arrow {
+    transition: transform 0.3s ease;
+    font-size: 0.8em;
+}
+
+/* Quando fechado (collapsed), a seta gira para o lado */
+.accordion-header.collapsed .arrow {
+    transform: rotate(-90deg);
+}
+
+/* Conteúdo da Lista */
+.accordion-content {
+    overflow: hidden;
+    max-height: 500px; /* Altura máxima quando aberto */
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* Animação suave */
+    background-color: #fff;
+    border-bottom: 1px solid #eee;
+}
+
+/* Quando fechado via JS */
+.accordion-content.hidden-content {
+    max-height: 0;
+}
+
+/* Botões da Lista (Estilo Menu) */
+.categoria-btn {
+    width: 100%;
+    padding: 15px 25px;
+    border: none;
+    background-color: transparent;
+    text-align: left;
+    font-size: 1em;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-left: 4px solid transparent;
+    border-bottom: 1px solid #f9f9f9;
+}
+
+.categoria-btn:hover {
+    background-color: #fdfbf7;
+    color: #d84315;
+    padding-left: 30px; /* Efeito de deslize */
+}
+
+.categoria-btn.selected {
+    background-color: #fff8e1;
+    color: #5d4037;
+    font-weight: bold;
+    border-left: 4px solid #ffc107;
+}
+
+/* --- RODAPÉ DA SIDEBAR (BOTÃO GERENCIAR) --- */
+.sidebar-footer {
+    margin-top: auto;
+    padding: 20px;
+    border-top: 1px solid #eee;
+    background-color: #f9f9f9;
+}
+
+.action-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #795548;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.95em;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    transition: transform 0.1s, background-color 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.action-btn:hover {
+    background-color: #5d4037;
+    transform: translateY(-1px);
+}
+
+.action-btn:active {
+    transform: translateY(1px);
+}
+
+/* ---------------------------------------------- */
 
 h2 {
     margin-bottom: 20px;
@@ -74,28 +187,11 @@ h2 {
     overflow-y: auto;
 }
 
-/* Botões de Categoria */
-.categoria-btn {
-    padding: 15px;
-    border: 1px solid #ddd;
-    background-color: #f9f9f9;
-    cursor: pointer;
-    text-align: left;
-    font-size: 1em;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    transition: background-color 0.2s;
-}
-
-.categoria-btn:hover {
-    background-color: #e9e9e9;
-}
-
-/* --- BOTÕES DE PRODUTO (COM A ALTERAÇÃO) --- */
+/* --- BOTÕES DE PRODUTO --- */
 .produto-btn {
     width: 120px;
     height: 100px;
-    background-color: #fff; /* Fundo branco padrão */
+    background-color: #fff;
     border: 1px solid #ccc;
     border-radius: 8px;
     cursor: pointer;
@@ -116,7 +212,6 @@ h2 {
     background-color: #4CAF50; 
     color: white; 
 }
-/* ------------------------------------------- */
 
 /* Lista de Pedidos */
 #lista-pedido {
@@ -126,8 +221,31 @@ h2 {
 }
 
 #lista-pedido li {
-    padding: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 5px;
     border-bottom: 1px dashed #ddd;
+}
+
+.btn-remove-item {
+    background-color: #fce4ec;
+    color: #ad1457;
+    border: 1px solid #f8bbd0;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 22px;
+    text-align: center;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-remove-item:hover {
+    background-color: #e91e63;
+    color: white;
+    border-color: #e91e63;
 }
 
 .total {
@@ -142,8 +260,8 @@ h2 {
     width: 100%;
     padding: 20px;
     font-size: 1.2em;
-    background-color: #FFC107; /* Amarelo */
-    color: #5d4037; /* Marrom escuro */
+    background-color: #FFC107;
+    color: #5d4037;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -152,12 +270,10 @@ h2 {
 }
 
 .btn-finalizar:hover {
-    background-color: #ffca28; /* Amarelo mais claro */
+    background-color: #ffca28;
 }
 
-
-/* --- ESTILOS PARA A PÁGINA DE PRODUTOS --- */
-
+/* --- PÁGINA DE PRODUTOS --- */
 .produtos-page .main-content {
     display: block;
 }
@@ -199,8 +315,7 @@ h2 {
     border: 1px solid #ccc;
 }
 
-/* --- ESTILOS PARA O MODAL DE PAGAMENTO --- */
-
+/* --- MODAL DE PAGAMENTO E ALERTA --- */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -243,8 +358,8 @@ h2 {
 }
 
 .payment-btn.selected {
-    border-color: #795548; /* Marrom */
-    background-color: #FFC107; /* Amarelo */
+    border-color: #795548;
+    background-color: #FFC107;
     color: #5d4037;
 }
 
@@ -310,37 +425,7 @@ h2 {
     background-color: #c82333;
 }
 
-/* --- AJUSTES NA LISTA DE PEDIDO --- */
-#lista-pedido li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 5px;
-    border-bottom: 1px dashed #ddd;
-}
-
-.btn-remove-item {
-    background-color: #fce4ec; /* Rosa bem claro */
-    color: #ad1457; /* Rosa escuro */
-    border: 1px solid #f8bbd0;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    font-weight: bold;
-    cursor: pointer;
-    line-height: 22px; /* Alinha o "x" verticalmente */
-    text-align: center;
-    transition: background-color 0.2s, color 0.2s;
-}
-
-.btn-remove-item:hover {
-    background-color: #e91e63; /* Rosa */
-    color: white;
-    border-color: #e91e63;
-}
-
-/* --- ESTILOS PARA O ACORDEÃO DE RELATÓRIOS --- */
-
+/* --- ACORDEÃO DE RELATÓRIOS --- */
 .payment-accordion {
     margin-top: 15px;
 }
@@ -349,7 +434,7 @@ h2 {
     border: 1px solid #e0e0e0;
     border-radius: 5px;
     margin-bottom: 10px;
-    overflow: hidden; /* Garante que o conteúdo não vaze durante a animação */
+    overflow: hidden;
 }
 
 .payment-summary {
@@ -393,4 +478,177 @@ h2 {
     list-style-position: inside;
     padding-left: 10px;
     margin-top: 5px;
+}
+
+/* --- ESTILOS ESPECÍFICOS DA PÁGINA DE PRODUTOS --- */
+
+/* Ajuste no container apenas para esta página */
+body.produtos-page .container {
+    background-color: #f0f2f5; /* Fundo cinza claro */
+    padding: 20px; 
+    gap: 20px; 
+}
+
+/* O Cartão do Formulário (Esquerda) */
+.sidebar-form {
+    width: 320px; /* Largura fixa ideal */
+    min-width: 320px;
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 12px; /* Cantos arredondados */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* Sombra suave */
+    height: fit-content; /* Altura se ajusta ao conteúdo */
+    display: flex;
+    flex-direction: column;
+}
+
+/* O Cartão da Tabela (Direita) */
+body.produtos-page .main-content {
+    flex-grow: 1;
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    height: 100%; /* Ocupa a altura disponível */
+    overflow: hidden; /* Para a rolagem ficar dentro da tabela */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Títulos dos Cartões */
+body.produtos-page h2 {
+    color: #5d4037;
+    font-size: 1.4em;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 15px;
+}
+
+/* Ajuste na tabela para ela rolar bonitinho */
+.products-table-wrapper {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+/* Inputs mais bonitos no formulário */
+.sidebar-form .input-group input,
+.sidebar-form .input-group select {
+    padding: 12px; /* Mais espaço para digitar */
+    border: 1px solid #e0e0e0;
+    background-color: #fafafa;
+    transition: border-color 0.2s;
+}
+
+.sidebar-form .input-group input:focus,
+.sidebar-form .input-group select:focus {
+    background-color: #fff;
+    border-color: #ffc107; /* Foco amarelo */
+    outline: none;
+}
+
+/* Botão Salvar com destaque */
+.sidebar-form .btn-finalizar {
+    margin-top: 10px;
+    padding: 15px;
+    font-size: 1.1em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 6px rgba(255, 193, 7, 0.3);
+}
+
+.sidebar-form .btn-finalizar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(255, 193, 7, 0.4);
+}
+
+/* --- MELHORIAS DE ESPAÇAMENTO (FINE TUNING) --- */
+
+/* 1. Mais espaço entre cada campo do formulário */
+.sidebar-form .input-group {
+    margin-bottom: 20px; /* Aumentei de 15px para 20px */
+}
+
+/* 2. Afastar um pouco o label do input para leitura melhor */
+.sidebar-form .input-group label {
+    margin-bottom: 8px; /* Um respiro entre o texto e a caixa */
+    font-weight: 500;   /* Um pouco mais de peso na fonte ajuda na hierarquia */
+    color: #4e342e;     /* Um marrom escuro suave */
+}
+
+/* 3. Descolar o botão "Salvar" do último campo */
+.sidebar-form .btn-finalizar {
+    margin-top: 30px; /* Empurra o botão para baixo */
+}
+
+/* 4. Dar "ar" para a tabela (Isso faz muita diferença!) */
+.products-table th, 
+.products-table td {
+    padding: 18px 15px; /* Mais altura nas linhas */
+    vertical-align: middle; /* Centraliza o texto verticalmente */
+}
+
+/* 5. Arrumar os botões de Editar/Excluir */
+/* Faz com que fiquem lado a lado com um espacinho, ou empilhados bonitinhos */
+.products-table td:last-child {
+    display: flex;
+    gap: 8px; /* Espaço entre os botões amarelo e vermelho */
+    justify-content: center;
+    border: none; /* Remove borda interna duplicada se houver */
+}
+
+/* Diminuir um pouco os botões da tabela para ficarem mais delicados */
+.btn-edit, .btn-delete {
+    padding: 6px 12px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+/* 6. Título das sessões com mais espaço embaixo */
+body.produtos-page h2 {
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+}
+
+/* --- CORREÇÃO DOS CANTOS DOS INPUTS --- */
+
+/* Força todos os cantos a serem redondos, mesmo que estejam lado a lado */
+.sidebar-form input,
+.sidebar-form select {
+    border-radius: 8px !important; 
+
+    border-top-right-radius: 8px !important;
+    border-bottom-right-radius: 8px !important;
+    border-top-left-radius: 8px !important;
+    border-bottom-left-radius: 8px !important;
+    
+}
+
+/* (Opcional) Se eles estiverem colados, adiciona um espacinho entre eles */
+.sidebar-form .row-de-inputs { /* <--- Talvez precise ajustar esse nome de classe */
+    gap: 15px; 
+}
+
+/* --- CORREÇÕES FINAIS (Bordas e Tabela) --- */
+
+/* 1. Forçar cantos redondos em TODOS os campos */
+.sidebar-form input,
+.sidebar-form select {
+    border-radius: 8px !important; /* O !important obriga o arredondamento */
+    border: 1px solid #e0e0e0;
+    /* Garante que nenhum estilo de navegador deixe a ponta quadrada */
+    -webkit-appearance: none; 
+    appearance: none;
+}
+
+/* 2. Trazer o botão Excluir de volta */
+body.produtos-page .main-content {
+    /* Antes estava 'hidden', que cortava o botão. 
+       Agora 'auto' cria uma barra de rolagem se precisar, mas mostra tudo. */
+    overflow: auto !important; 
+}
+
+/* Garantir que a coluna de Ações tenha espaço para os dois botões */
+.products-table td:last-child {
+    white-space: nowrap; /* Impede que os botões fiquem um em cima do outro */
+    min-width: 160px;    /* Força uma largura mínima para caber Editar e Excluir */
 }
