@@ -45,15 +45,27 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
 
             group.salesList.forEach(sale => {
-                const saleTime = new Date(sale.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                const dateString = sale.createdAt.replace(' ', 'T') + 'Z';
+                const dateObj = new Date(dateString);
+                
+                const saleTime = dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                
+                // Se não tiver vendedor (vendas antigas), mostra traço
+                const vendedor = sale.sellerName ? sale.sellerName : '-';
+
                 reportHtml += `
                     <div class="sale-record">
-                        <p><strong>Venda de ${saleTime} - Total: R$ ${sale.total.toFixed(2)}</strong></p>
-                        <ul>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <strong>⏰ ${saleTime} &nbsp; | &nbsp; 👤 Vendido por: ${vendedor}</strong>
+                            <strong>R$ ${sale.total.toFixed(2)}</strong>
+                        </div>
+                        <ul style="margin-top: 0; padding-left: 20px; color: #666;">
                 `;
+                
                 sale.items.forEach(item => {
                     reportHtml += `<li>${item.name} - R$ ${item.price.toFixed(2)}</li>`;
                 });
+                
                 reportHtml += `</ul></div>`;
             });
 

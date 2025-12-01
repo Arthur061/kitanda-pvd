@@ -237,11 +237,18 @@ ipcMain.handle('categories:get', async () => {
 ipcMain.handle('sale:finalize', async (event, saleData) => {
   const db = getDb();
   const { items, total, paymentMethod } = saleData;
+  
+  // Pega o usuário logado (se não tiver, usa "Desconhecido")
+  const sellerName = currentUser ? currentUser.username : 'Desconhecido';
+
   return new Promise((resolve) => {
     db.serialize(() => {
       db.run('BEGIN TRANSACTION;');
-      const saleSql = 'INSERT INTO sales (total, payment_method) VALUES (?, ?)';
-      db.run(saleSql, [total, paymentMethod], function (err) {
+      
+      // INCLUÍDO: seller_name
+      const saleSql = 'INSERT INTO sales (total, payment_method, seller_name) VALUES (?, ?, ?)';
+      
+      db.run(saleSql, [total, paymentMethod, sellerName], function (err) {
         if (err) {
           db.run('ROLLBACK;');
           return resolve({ success: false, message: err.message });
@@ -274,7 +281,6 @@ ipcMain.handle('sale:finalize', async (event, saleData) => {
   });
 });
 
-// <<<<<<<<<<<<<<< INÍCIO DA MODIFICAÇÃO >>>>>>>>>>>>>>>>>
 ipcMain.handle('reports:get-sales-by-date', async (event, date) => {
   const db = getDb();
   return new Promise((resolve) => {
@@ -284,6 +290,7 @@ ipcMain.handle('reports:get-sales-by-date', async (event, date) => {
         s.total as sale_total,
         s.payment_method,
         s.created_at,
+        s.seller_name,  -- Buscando o vendedor
         p.name as product_name,
         si.price as item_price
       FROM sales s
@@ -298,7 +305,6 @@ ipcMain.handle('reports:get-sales-by-date', async (event, date) => {
         return resolve([]);
       }
       
-      // Agrupa os itens de produto dentro de cada venda
       const salesById = {};
       rows.forEach(row => {
         if (!salesById[row.sale_id]) {
@@ -307,6 +313,7 @@ ipcMain.handle('reports:get-sales-by-date', async (event, date) => {
             total: row.sale_total,
             paymentMethod: row.payment_method,
             createdAt: row.created_at,
+            sellerName: row.seller_name, // Guardando no objeto
             items: []
           };
         }

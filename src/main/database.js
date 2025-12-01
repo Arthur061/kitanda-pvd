@@ -45,9 +45,17 @@ const initDb = () => {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         total REAL NOT NULL,
         payment_method TEXT NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        seller_name TEXT  -- Nova coluna para o vendedor
       )
-    `);
+    `, (err) => {
+        // Tenta adicionar a coluna caso a tabela já exista (Migração para versões antigas)
+        if (!err) {
+            db.run("ALTER TABLE sales ADD COLUMN seller_name TEXT", (alterErr) => {
+                // Se der erro é porque a coluna já existe, então ignoramos
+            });
+        }
+    });
 
     // Tabela para guardar os itens de cada venda
     db.run(`
