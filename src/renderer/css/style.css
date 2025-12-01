@@ -652,3 +652,58 @@ body.produtos-page .main-content {
     white-space: nowrap; /* Impede que os botões fiquem um em cima do outro */
     min-width: 160px;    /* Força uma largura mínima para caber Editar e Excluir */
 }
+
+/* --- ESTILO DO ALERTA MODERNO --- */
+
+/* Ajustes específicos para a caixa de alerta */
+.modal-content.alert-style {
+    max-width: 400px; /* Mais estreito que o de pagamento */
+    padding: 35px 25px;
+    border-top: 6px solid #ffc107; /* Tarja amarela no topo */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Ícone grande animado */
+.alert-icon {
+    font-size: 3em;
+    margin-bottom: 15px;
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Título do Alerta */
+#alert-title {
+    color: #5d4037;
+    font-size: 1.6em;
+    margin-bottom: 10px;
+    border: none; /* Removemos a linha padrão de h2 */
+}
+
+/* Mensagem do texto */
+#alert-message {
+    font-size: 1.1em;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 25px;
+}
+
+/* Botão "Entendi" */
+#alert-ok-btn {
+    width: 100%;
+    background-color: #5d4037; /* Marrom para confirmar */
+    padding: 12px;
+    font-size: 1.1em;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+#alert-ok-btn:hover {
+    background-color: #3e2723;
+}
+
+/* Animação de entrada suave (Pop) */
+@keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
