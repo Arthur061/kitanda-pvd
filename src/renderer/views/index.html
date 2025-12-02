@@ -10,24 +10,31 @@
     <div class="background-logo"></div>
     <div class="container">
         <div class="sidebar" id="categorias">
-            <button id="category-toggle-btn" class="accordion-header collapsed">
-                <span style="display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 1.2em;">📂</span> Categorias
-                </span>
-                <span class="arrow">▼</span>
-            </button>
+            <div class="user-profile-card">
+                <div class="avatar-circle" id="user-avatar">U</div>
+                <div class="user-info">
+                    <span class="welcome-text">Olá,</span>
+                    <strong id="display-username">Usuário</strong>
+                    <span id="display-role" class="badge-role">...</span>
+                </div>
+            </div>
+
+            <div class="menu-label">CATEGORIAS</div>
             
-            <div id="category-buttons-container" class="accordion-content">
-                <button class="categoria-btn selected">Todos</button>
-                <button class="categoria-btn">Lanches</button>
-                <button class="categoria-btn">Bebidas</button>
-                <button class="categoria-btn">Combos</button>
-                <button class="categoria-btn">Outros</button>
+            <div id="category-buttons-container" class="accordion-content open">
+                <button class="categoria-btn selected">📦 Todos</button>
+                <button class="categoria-btn">🍔 Lanches</button>
+                <button class="categoria-btn">🥤 Bebidas</button>
+                <button class="categoria-btn">🍟 Combos</button>
+                <button class="categoria-btn">🍩 Outros</button>
             </div>
 
             <div class="sidebar-footer">
-                <button id="manage-products-btn" class="action-btn">
-                    ⚙️ Gerenciar Estoque
+                <button id="manage-products-btn" class="action-btn btn-secondary">
+                    ⚙️ Estoque
+                </button>
+                <button id="logout-btn" class="action-btn btn-danger">
+                    🚪 Sair
                 </button>
             </div>
         </div>
@@ -76,6 +83,28 @@
             <h2 id="alert-title">Atenção</h2>
             <p id="alert-message">Mensagem de alerta aqui...</p>
             <button id="alert-ok-btn" class="btn-confirm">Entendi</button>
+        </div>
+    </div>
+    <div id="logout-confirmation-modal" class="modal-overlay hidden">
+        <div class="modal-content logout-modal">
+            
+            <div class="modal-header">
+                <h3 style="margin: 0; color: #d32f2f; font-size: 1.5em;">Sair do Sistema?</h3>
+            </div>
+            
+            <div class="modal-body">
+                <p style="font-size: 1.1em; margin: 0;">Tem certeza que deseja encerrar sua sessão?</p>
+            </div>
+            
+            <div class="modal-footer">
+                <button id="cancel-logout-btn" class="modal-btn btn-cancel-custom">
+                    Cancelar
+                </button>
+                
+                <button id="confirm-logout-btn" class="modal-btn btn-confirm-custom">
+                    Sim, Sair
+                </button>
+            </div>
         </div>
     </div>
     <script src="../js/renderer.js"></script>

@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld('api', {
   login: (username, password) => ipcRenderer.invoke('login:submit', username, password),
   register: (username, password) => ipcRenderer.invoke('register:submit', username, password),
   getCurrentUser: () => ipcRenderer.invoke('auth:get-current-user'),
+  logout: () => ipcRenderer.send('auth:logout'),
 
   // Funções de Navegação
   goToRegister: () => ipcRenderer.send('navigate:to-register'),

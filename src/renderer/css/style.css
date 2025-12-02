@@ -565,35 +565,34 @@ body.produtos-page h2 {
 
 /* 1. Mais espaço entre cada campo do formulário */
 .sidebar-form .input-group {
-    margin-bottom: 20px; /* Aumentei de 15px para 20px */
+    margin-bottom: 20px; 
 }
 
 /* 2. Afastar um pouco o label do input para leitura melhor */
 .sidebar-form .input-group label {
-    margin-bottom: 8px; /* Um respiro entre o texto e a caixa */
-    font-weight: 500;   /* Um pouco mais de peso na fonte ajuda na hierarquia */
+    margin-bottom: 8px; 
+    font-weight: 500;   
     color: #4e342e;     /* Um marrom escuro suave */
 }
 
-/* 3. Descolar o botão "Salvar" do último campo */
+/* 3. Mais espaço acima do botão Salvar */
 .sidebar-form .btn-finalizar {
-    margin-top: 30px; /* Empurra o botão para baixo */
+    margin-top: 30px; 
 }
 
 /* 4. Dar "ar" para a tabela (Isso faz muita diferença!) */
 .products-table th, 
 .products-table td {
-    padding: 18px 15px; /* Mais altura nas linhas */
-    vertical-align: middle; /* Centraliza o texto verticalmente */
+    padding: 18px 15px; 
+    vertical-align: middle; 
 }
 
 /* 5. Arrumar os botões de Editar/Excluir */
-/* Faz com que fiquem lado a lado com um espacinho, ou empilhados bonitinhos */
 .products-table td:last-child {
     display: flex;
-    gap: 8px; /* Espaço entre os botões amarelo e vermelho */
+    gap: 8px; 
     justify-content: center;
-    border: none; /* Remove borda interna duplicada se houver */
+    border: none;
 }
 
 /* Diminuir um pouco os botões da tabela para ficarem mais delicados */
@@ -609,7 +608,6 @@ body.produtos-page h2 {
     padding-bottom: 15px;
 }
 
-/* --- CORREÇÃO DOS CANTOS DOS INPUTS --- */
 
 /* Força todos os cantos a serem redondos, mesmo que estejam lado a lado */
 .sidebar-form input,
@@ -623,43 +621,35 @@ body.produtos-page h2 {
     
 }
 
-/* (Opcional) Se eles estiverem colados, adiciona um espacinho entre eles */
-.sidebar-form .row-de-inputs { /* <--- Talvez precise ajustar esse nome de classe */
+.sidebar-form .row-de-inputs { 
     gap: 15px; 
 }
 
-/* --- CORREÇÕES FINAIS (Bordas e Tabela) --- */
 
-/* 1. Forçar cantos redondos em TODOS os campos */
+
 .sidebar-form input,
 .sidebar-form select {
-    border-radius: 8px !important; /* O !important obriga o arredondamento */
+    border-radius: 8px !important; 
     border: 1px solid #e0e0e0;
-    /* Garante que nenhum estilo de navegador deixe a ponta quadrada */
     -webkit-appearance: none; 
     appearance: none;
 }
 
-/* 2. Trazer o botão Excluir de volta */
+
 body.produtos-page .main-content {
-    /* Antes estava 'hidden', que cortava o botão. 
-       Agora 'auto' cria uma barra de rolagem se precisar, mas mostra tudo. */
     overflow: auto !important; 
 }
 
-/* Garantir que a coluna de Ações tenha espaço para os dois botões */
 .products-table td:last-child {
     white-space: nowrap; /* Impede que os botões fiquem um em cima do outro */
     min-width: 160px;    /* Força uma largura mínima para caber Editar e Excluir */
 }
 
-/* --- ESTILO DO ALERTA MODERNO --- */
-
-/* Ajustes específicos para a caixa de alerta */
+/* --- ESTILO DO MODAL DE ALERTA PERSONALIZADO --- */
 .modal-content.alert-style {
-    max-width: 400px; /* Mais estreito que o de pagamento */
+    max-width: 400px; 
     padding: 35px 25px;
-    border-top: 6px solid #ffc107; /* Tarja amarela no topo */
+    border-top: 6px solid #ffc107; 
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -677,7 +667,7 @@ body.produtos-page .main-content {
     color: #5d4037;
     font-size: 1.6em;
     margin-bottom: 10px;
-    border: none; /* Removemos a linha padrão de h2 */
+    border: none;
 }
 
 /* Mensagem do texto */
@@ -706,4 +696,274 @@ body.produtos-page .main-content {
 @keyframes popIn {
     0% { transform: scale(0.5); opacity: 0; }
     100% { transform: scale(1); opacity: 1; }
+}
+
+/* --- BOTÃO DE SAIR (Barra Lateral) --- */
+/* Estado Inicial: Branco com texto vermelho (Mais limpo) */
+#logout-btn {
+    background-color: #ffffff;
+    color: #e53935; /* Vermelho vibrante */
+    border: 2px solid #ffebee; /* Borda vermelha bem clarinha */
+    font-weight: 700;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* Hover: Fica vermelho sólido com texto branco */
+#logout-btn:hover {
+    background-color: #e53935;
+    color: #ffffff;
+    border-color: #e53935;
+    transform: translateY(-2px); /* Leve subida */
+    box-shadow: 0 4px 8px rgba(229, 57, 53, 0.3);
+}
+
+/* --- MODAL DE LOGOUT --- */
+.logout-modal {
+    max-width: 400px;
+    border-radius: 12px; 
+    padding: 0; 
+    overflow: hidden;
+    border: none; 
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2); /* Sombra profunda */
+}
+
+.modal-header {
+    background-color: #fff;
+    padding: 20px 20px 10px;
+    text-align: center;
+}
+
+.modal-body {
+    padding: 10px 30px 30px;
+    text-align: center;
+    color: #666;
+}
+
+/* Container dos botões do modal */
+.modal-footer {
+    background-color: #f9f9f9; /* Fundo levemente diferente para os botões */
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 15px; /* Espaço entre os botões */
+    border-top: 1px solid #eee;
+}
+
+/* Estilo Base dos Botões do Modal */
+.modal-btn {
+    padding: 12px 30px;
+    font-size: 1em;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: filter 0.2s, transform 0.1s;
+    border: none;
+}
+
+.modal-btn:active {
+    transform: scale(0.95); /* Efeito de clique */
+}
+
+/* Botão Cancelar (Cinza/Neutro) */
+.btn-cancel-custom {
+    background-color: #e0e0e0;
+    color: #555;
+}
+
+.btn-cancel-custom:hover {
+    background-color: #d6d6d6;
+    color: #333;
+}
+
+/* Botão Confirmar (Vermelho/Ação) */
+.btn-confirm-custom {
+    background-color: #e53935;
+    color: white;
+    box-shadow: 0 4px 6px rgba(229, 57, 53, 0.2);
+}
+
+.btn-confirm-custom:hover {
+    background-color: #d32f2f;
+    box-shadow: 0 6px 10px rgba(229, 57, 53, 0.3);
+}
+
+/* --- SIDEBAR MODERNA --- */
+.sidebar {
+    background-color: #ffffff;
+    width: 260px; /* Um pouco mais largo para acomodar o design */
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #e0e0e0; /* Borda sutil em vez de sombra pesada */
+    height: 100vh;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* --- PERFIL DO USUÁRIO --- */
+.user-profile-card {
+    padding: 25px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 1px solid #f0f0f0;
+    background-color: #fffbf5; /* Fundo levemente creme para destaque */
+}
+
+.avatar-circle {
+    width: 45px;
+    height: 45px;
+    background-color: #5d4037; /* Marrom da marca */
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(93, 64, 55, 0.3);
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.welcome-text {
+    font-size: 0.8em;
+    color: #888;
+}
+
+#display-username {
+    font-size: 1.1em;
+    color: #333;
+    text-transform: capitalize; /* Primeira letra maiúscula */
+}
+
+.badge-role {
+    font-size: 0.75em;
+    background-color: #ffe0b2;
+    color: #e65100;
+    padding: 2px 8px;
+    border-radius: 10px;
+    width: fit-content;
+    margin-top: 2px;
+    font-weight: 600;
+}
+
+/* --- MENU DE CATEGORIAS --- */
+.menu-label {
+    padding: 20px 25px 10px;
+    font-size: 0.75em;
+    font-weight: bold;
+    color: #aaa;
+    letter-spacing: 1px;
+}
+
+.accordion-content {
+    flex-grow: 1; /* Ocupa o espaço disponível */
+    overflow-y: auto;
+    padding: 0 10px; /* Margem lateral para os botões não colarem na borda */
+}
+
+.categoria-btn {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 5px;
+    border: none;
+    background: transparent;
+    text-align: left;
+    font-size: 0.95em;
+    color: #555;
+    border-radius: 8px; /* Botões arredondados modernos */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: none; /* Removemos a borda lateral antiga */
+    font-weight: 500;
+}
+
+.categoria-btn:hover {
+    background-color: #f5f5f5;
+    color: #333;
+    transform: translateX(3px); /* Movimento sutil */
+}
+
+.categoria-btn.selected {
+    background-color: #5d4037; /* Fundo marrom ativo */
+    color: white;
+    box-shadow: 0 4px 10px rgba(93, 64, 55, 0.2); /* Sombra suave */
+}
+
+/* --- RODAPÉ E BOTÕES --- */
+.sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.action-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9em;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: filter 0.2s, transform 0.1s;
+}
+
+.action-btn:active {
+    transform: scale(0.98);
+}
+
+/* Botão de Estoque (Secundário) */
+.btn-secondary {
+    background-color: #ffffff;
+    color: #5d4037;
+    border: 1px solid #e0e0e0;
+}
+
+.btn-secondary:hover {
+    background-color: #f9f9f9;
+    border-color: #5d4037;
+}
+
+/* --- Botão de Sair da Barra Lateral  --- */
+.btn-danger {
+    background-color: #fff;
+    color: #d32f2f; /* Vermelho mais elegante */
+    border: 1px solid #ef9a9a; /* Borda sutil avermelhada */
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-danger:hover {
+    background-color: #d32f2f; /* O fundo vira vermelho ao passar o mouse */
+    color: white; /* O texto vira branco */
+    border-color: #d32f2f;
+    box-shadow: 0 4px 8px rgba(211, 47, 47, 0.2); /* Sombra suave */
+}
+
+/* --- Estilo para o Modal de Logout --- */
+.logout-modal {
+    max-width: 400px; 
+    border-top: 4px solid #d32f2f; /* Detalhe vermelho no topo */
+}
+
+.btn-danger-solid {
+    background-color: #d32f2f;
+    color: white;
+    border: none;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.btn-danger-solid:hover {
+    background-color: #b71c1c; /* Vermelho mais escuro */
 }

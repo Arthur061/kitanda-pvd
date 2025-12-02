@@ -143,6 +143,20 @@ ipcMain.handle('login:submit', async (event, username, password) => {
     });
 });
 
+ipcMain.on('auth:logout', () => {
+    // 1. Limpa o usuário atual
+    currentUser = null; 
+    
+    // 2. Fecha a janela principal se estiver aberta
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.close();
+        mainWindow = null; // Limpa a referência
+    }
+    
+    // 3. Abre a janela de Login novamente
+    createLoginWindow();
+});
+
 ipcMain.handle('auth:get-current-user', () => currentUser);
 
 ipcMain.handle('register:submit', async (event, username, password) => {

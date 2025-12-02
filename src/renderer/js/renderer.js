@@ -9,6 +9,12 @@ const categoryToggleBtn = document.getElementById('category-toggle-btn');
 const categoryContainer = document.getElementById('category-buttons-container');
 const manageProductsBtn = document.getElementById('manage-products-btn');
 const botoesDeCategoria = document.querySelectorAll('.categoria-btn');
+const logoutBtn = document.getElementById('logout-btn');
+
+// ELEMENTOS DO MODAL DE LOGOUT
+const logoutModal = document.getElementById('logout-confirmation-modal');
+const cancelLogoutBtn = document.getElementById('cancel-logout-btn');
+const confirmLogoutBtn = document.getElementById('confirm-logout-btn');
 
 // Modal de Pagamento
 const paymentModal = document.getElementById('payment-modal');
@@ -54,20 +60,42 @@ async function carregarDadosIniciais() {
     try {
         const user = await window.api.getCurrentUser();
         
+        // --- ATUALIZAR PERFIL ---
+        if (user) {
+            // Atualiza o nome
+            const nomeUsuario = document.getElementById('display-username');
+            if (nomeUsuario) nomeUsuario.innerText = user.username;
+
+            // Atualiza o cargo (Badge)
+            const roleBadge = document.getElementById('display-role');
+            if (roleBadge) {
+                roleBadge.innerText = user.role === 'admin' ? 'Administrador' : 'Vendedor';
+                
+                if (user.role !== 'admin') {
+                    roleBadge.style.backgroundColor = '#e0f7fa';
+                    roleBadge.style.color = '#006064';
+                }
+            }
+
+            // Atualiza o Avatar (Primeira letra do nome)
+            const avatar = document.getElementById('user-avatar');
+            if (avatar) {
+                avatar.innerText = user.username.charAt(0).toUpperCase();
+            }
+        } // <--- ADICIONE ESTA CHAVE AQUI PARA FECHAR O IF DO PERFIL
+        
         // Se for admin, adiciona o botão de Relatórios no menu
-        // (O botão de Estoque já está fixo no HTML agora)
         if (user && user.role === 'admin' && !document.getElementById('btn-relatorios')) {
             const reportsBtn = document.createElement('button');
             reportsBtn.id = 'btn-relatorios';
-            reportsBtn.className = 'categoria-btn'; // Usa o mesmo estilo da lista
+            reportsBtn.className = 'categoria-btn'; 
             reportsBtn.innerHTML = '📈 Relatórios Admin';
-            reportsBtn.style.borderLeft = '4px solid #795548'; // Destaque visual
+            reportsBtn.style.borderLeft = '4px solid #795548'; 
             
             reportsBtn.addEventListener('click', () => {
                 window.api.openManagementWindow();
             });
 
-            // Adiciona no final da lista de categorias
             if(categoryContainer) {
                 categoryContainer.appendChild(reportsBtn);
             }
@@ -157,7 +185,6 @@ function resetPaymentModal() {
 
 // 1. Menu Cascata (Abrir/Fechar)
 if (categoryToggleBtn && categoryContainer) {
-    // Estado inicial: Se tiver a classe 'collapsed' no HTML, esconde o conteúdo
     if (categoryToggleBtn.classList.contains('collapsed')) {
         categoryContainer.classList.add('hidden-content');
     }
@@ -246,6 +273,38 @@ if (listaPedidoUl) {
             const index = parseInt(e.target.dataset.index, 10);
             pedidoAtual.splice(index, 1);
             renderizarPedido();
+        }
+    });
+}
+
+// 8. Logout (Lógica MODERNA)
+if (logoutBtn && logoutModal) {
+    // Quando clica no botão "Sair" da barra lateral
+    logoutBtn.addEventListener('click', () => {
+        logoutModal.classList.remove('hidden');
+    });
+}
+
+// Listener para o botão "Cancelar" dentro do modal
+if (cancelLogoutBtn && logoutModal) {
+    cancelLogoutBtn.addEventListener('click', () => {
+        logoutModal.classList.add('hidden'); // Apenas fecha o modal
+    });
+}
+
+// Listener para o botão "Sim, Sair" dentro do modal
+if (confirmLogoutBtn && logoutModal) {
+    confirmLogoutBtn.addEventListener('click', async () => {
+        logoutModal.classList.add('hidden'); // Fecha o modal
+        window.api.logout(); // Chama a função de logout real
+    });
+}
+
+// Fechar o modal se clicar fora dele (no overlay escuro)
+if (logoutModal) {
+    logoutModal.addEventListener('click', (e) => {
+        if (e.target === logoutModal) {
+            logoutModal.classList.add('hidden');
         }
     });
 }
