@@ -70,6 +70,25 @@ const initDb = () => {
       )
     `);
 
+    // Tabela para categorias de produtos
+    db.run(`
+      CREATE TABLE IF NOT EXISTS sales (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        total REAL NOT NULL,
+        payment_method TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        seller_name TEXT,
+        discount REAL DEFAULT 0 -- NOVA COLUNA
+      )
+    `, (err) => {
+        // Migração para adicionar colunas em bancos existentes
+        if (!err) {
+            db.run("ALTER TABLE sales ADD COLUMN seller_name TEXT", () => {});
+            // ADICIONE ESTA LINHA:
+            db.run("ALTER TABLE sales ADD COLUMN discount REAL DEFAULT 0", () => {}); 
+        }
+    });
+
     // Lógica para criar o usuário 'admin' e garantir que ele tenha a role 'admin'
     const adminUser = 'kitanda';
     db.get('SELECT * FROM users WHERE username = ?', [adminUser], (err, row) => {

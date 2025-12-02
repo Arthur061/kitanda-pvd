@@ -250,25 +250,27 @@ ipcMain.handle('categories:get', async () => {
 
 ipcMain.handle('sale:finalize', async (event, saleData) => {
   const db = getDb();
-  const { items, total, paymentMethod } = saleData;
+  // DESESTRUTURAR O DISCOUNT AQUI
+  const { items, total, paymentMethod, discount } = saleData; 
   
-  // Pega o usuário logado (se não tiver, usa "Desconhecido")
   const sellerName = currentUser ? currentUser.username : 'Desconhecido';
 
   return new Promise((resolve) => {
     db.serialize(() => {
       db.run('BEGIN TRANSACTION;');
       
-      // INCLUÍDO: seller_name
-      const saleSql = 'INSERT INTO sales (total, payment_method, seller_name) VALUES (?, ?, ?)';
+      // ATUALIZAR O SQL PARA INCLUIR O DISCOUNT
+      const saleSql = 'INSERT INTO sales (total, payment_method, seller_name, discount) VALUES (?, ?, ?, ?)';
       
-      db.run(saleSql, [total, paymentMethod, sellerName], function (err) {
+      // PASSAR O DISCOUNT NOS PARÂMETROS
+      db.run(saleSql, [total, paymentMethod, sellerName, discount || 0], function (err) {
         if (err) {
           db.run('ROLLBACK;');
           return resolve({ success: false, message: err.message });
         }
         const saleId = this.lastID;
         const itemsPromises = items.map(item => {
+
           return new Promise((itemResolve, itemReject) => {
             const itemSql = 'INSERT INTO sale_items (sale_id, product_id, quantity, price) VALUES (?, ?, ?, ?)';
             db.run(itemSql, [saleId, item.id, 1, item.price], function (itemErr) {
@@ -304,7 +306,8 @@ ipcMain.handle('reports:get-sales-by-date', async (event, date) => {
         s.total as sale_total,
         s.payment_method,
         s.created_at,
-        s.seller_name,  -- Buscando o vendedor
+        s.seller_name,
+        s.discount,  -- ADICIONADO: Buscar a coluna de desconto
         p.name as product_name,
         si.price as item_price
       FROM sales s
@@ -315,7 +318,7 @@ ipcMain.handle('reports:get-sales-by-date', async (event, date) => {
     `;
     db.all(sql, [date], (err, rows) => {
       if (err) {
-        console.error("Erro ao buscar relatório de vendas detalhado:", err);
+        console.error("Erro ao buscar relatório:", err);
         return resolve([]);
       }
       
@@ -327,7 +330,8 @@ ipcMain.handle('reports:get-sales-by-date', async (event, date) => {
             total: row.sale_total,
             paymentMethod: row.payment_method,
             createdAt: row.created_at,
-            sellerName: row.seller_name, // Guardando no objeto
+            sellerName: row.seller_name,
+            discount: row.discount || 0, 
             items: []
           };
         }

@@ -1,4 +1,10 @@
-// --- SELEÇÃO DE ELEMENTOS DO DOM ---
+// --- SELEÇÃO DE ELEMENTOS DO DOM DO MODAL DE PAGAMENTO ---
+const modalTotalDisplay = document.getElementById('modal-total-display');
+const discountSection = document.getElementById('discount-section');
+const discountInput = document.getElementById('discount-input');
+const modalFinalTotal = document.getElementById('modal-final-total');
+
+// --- SELEÇÃO DE ELEMENTOS DO DOM PRINCIPAL ---
 const produtosDiv = document.getElementById('produtos');
 const listaPedidoUl = document.getElementById('lista-pedido');
 const valorTotalSpan = document.getElementById('valor-total');
@@ -34,6 +40,7 @@ const alertOkBtn = document.getElementById('alert-ok-btn');
 let pedidoAtual = [];
 let todosOsProdutos = [];
 let selectedPaymentMethod = null;
+let percentualDesconto = 0; // Armazena a porcentagem do desconto
 
 // --- FUNÇÕES AUXILIARES ---
 
@@ -60,29 +67,25 @@ async function carregarDadosIniciais() {
     try {
         const user = await window.api.getCurrentUser();
         
-        // --- ATUALIZAR PERFIL ---
+        // --- ATUALIZAR PERFIL (Se existir no HTML) ---
         if (user) {
-            // Atualiza o nome
             const nomeUsuario = document.getElementById('display-username');
             if (nomeUsuario) nomeUsuario.innerText = user.username;
 
-            // Atualiza o cargo (Badge)
             const roleBadge = document.getElementById('display-role');
             if (roleBadge) {
                 roleBadge.innerText = user.role === 'admin' ? 'Administrador' : 'Vendedor';
-                
                 if (user.role !== 'admin') {
                     roleBadge.style.backgroundColor = '#e0f7fa';
                     roleBadge.style.color = '#006064';
                 }
             }
 
-            // Atualiza o Avatar (Primeira letra do nome)
             const avatar = document.getElementById('user-avatar');
             if (avatar) {
                 avatar.innerText = user.username.charAt(0).toUpperCase();
             }
-        } // <--- ADICIONE ESTA CHAVE AQUI PARA FECHAR O IF DO PERFIL
+        } 
         
         // Se for admin, adiciona o botão de Relatórios no menu
         if (user && user.role === 'admin' && !document.getElementById('btn-relatorios')) {
@@ -110,16 +113,19 @@ async function carregarDadosIniciais() {
     }
 }
 
-function filtrarProdutosPorCategoria(categoria) {
+function filtrarProdutosPorCategoria(categoriaTexto) {
     if (!produtosDiv) return;
     produtosDiv.innerHTML = '';
     
-    // Se a categoria for "Relatórios Admin", não faz nada (já tratado no clique)
-    if (categoria === '📈 Relatórios Admin') return;
+    // Tratamento simples para remover emojis caso o texto venha com eles (ex: "🍔 Lanches" -> "Lanches")
+    // Se você não usar emojis no HTML, isso não atrapalha.
+    const categoriaLimpa = categoriaTexto.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27FF]/g, "").replace(/📦|🍔|🥤|🍟|🍩|📈/g, "").trim();
 
-    const produtosFiltrados = (categoria.toLowerCase() === 'todos')
+    if (categoriaLimpa === 'Relatórios Admin') return;
+
+    const produtosFiltrados = (categoriaLimpa.toLowerCase() === 'todos')
         ? todosOsProdutos
-        : todosOsProdutos.filter(p => p.category === categoria);
+        : todosOsProdutos.filter(p => p.category === categoriaLimpa);
 
     produtosFiltrados.forEach(produto => {
         const btn = document.createElement('button');
@@ -131,7 +137,6 @@ function filtrarProdutosPorCategoria(categoria) {
 }
 
 function adicionarAoPedido(produto) {
-    // Atualiza dados frescos
     const produtoNoBanco = todosOsProdutos.find(p => p.id === produto.id);
     const estoqueAtual = produtoNoBanco?.stock || 0;
     const estoqueMinimo = produtoNoBanco?.min_stock || 0;
@@ -141,7 +146,6 @@ function adicionarAoPedido(produto) {
         pedidoAtual.push(produto);
         renderizarPedido();
 
-        // Verifica nível de alerta
         const restante = estoqueAtual - (quantidadeNoPedido + 1);
         if (restante <= estoqueMinimo) {
             showAlert(`O produto "${produto.name}" está com estoque baixo!\nRestam ${restante} unidades.`, 'Alerta de Estoque');
@@ -171,14 +175,32 @@ function renderizarPedido() {
 
     const totalFormatado = `R$ ${total.toFixed(2)}`;
     if (valorTotalSpan) valorTotalSpan.innerText = totalFormatado;
-    if (modalTotal) modalTotal.innerText = totalFormatado;
 }
+
+// --- LÓGICA DO MODAL DE PAGAMENTO E DESCONTO ---
 
 function resetPaymentModal() {
     selectedPaymentMethod = null;
+    percentualDesconto = 0;
+    
     if(selectedPaymentDisplay) selectedPaymentDisplay.innerText = '-';
+    if(discountInput) discountInput.value = '';
+    
+    // Esconde a seção de desconto e remove seleção dos botões
+    if(discountSection) discountSection.classList.add('hidden');
     paymentOptions.forEach(btn => btn.classList.remove('selected'));
+    
     if(confirmSaleBtn) confirmSaleBtn.disabled = true;
+}
+
+function calcularTotalComDesconto() {
+    const totalOriginal = pedidoAtual.reduce((sum, item) => sum + item.price, 0);
+    
+    // Cálculo: Total * (Porcentagem / 100)
+    const valorDoDesconto = totalOriginal * (percentualDesconto / 100);
+    const totalFinal = totalOriginal - valorDoDesconto;
+
+    if(modalFinalTotal) modalFinalTotal.innerText = `R$ ${totalFinal.toFixed(2)}`;
 }
 
 // --- EVENT LISTENERS (BOTÕES) ---
@@ -190,17 +212,15 @@ if (categoryToggleBtn && categoryContainer) {
     }
 
     categoryToggleBtn.addEventListener('click', () => {
-        categoryContainer.classList.toggle('hidden-content'); // CSS controla a altura
-        categoryToggleBtn.classList.toggle('collapsed');      // CSS gira a seta
+        categoryContainer.classList.toggle('hidden-content');
+        categoryToggleBtn.classList.toggle('collapsed');
     });
 }
 
 // 2. Botões de Categoria (Seleção)
 botoesDeCategoria.forEach(botao => {
     botao.addEventListener('click', (e) => {
-        // Limpa seleção anterior
         document.querySelectorAll('.categoria-btn').forEach(btn => btn.classList.remove('selected'));
-        // Marca novo
         e.target.classList.add('selected');
         
         const categoria = e.target.innerText;
@@ -208,24 +228,32 @@ botoesDeCategoria.forEach(botao => {
     });
 });
 
-// 3. Botão Gerenciar Estoque (Abre janela de Produtos)
+// 3. Botão Gerenciar Estoque
 if (manageProductsBtn) {
     manageProductsBtn.addEventListener('click', () => {
         window.api.openProductsWindow();
     });
 }
 
-// 4. Botões de Venda
+// 4. Botões de Venda (Abrir Modal)
 if (finalizarVendaBtn) {
     finalizarVendaBtn.addEventListener('click', () => {
         if (pedidoAtual.length === 0) {
             showAlert('O pedido está vazio.', 'Aviso');
             return;
         }
+        
+        resetPaymentModal();
+        
+        // Exibe o total inicial
+        const total = pedidoAtual.reduce((sum, item) => sum + item.price, 0);
+        if(modalTotalDisplay) modalTotalDisplay.innerText = `R$ ${total.toFixed(2)}`;
+        
         paymentModal.classList.remove('hidden');
     });
 }
 
+// Botão Cancelar Venda
 if (cancelSaleBtn) {
     cancelSaleBtn.addEventListener('click', () => {
         paymentModal.classList.add('hidden');
@@ -233,7 +261,7 @@ if (cancelSaleBtn) {
     });
 }
 
-// 5. Opções de Pagamento
+// 5. Opções de Pagamento (Ao clicar, mostra o desconto)
 paymentOptions.forEach(button => {
     button.addEventListener('click', () => {
         paymentOptions.forEach(btn => btn.classList.remove('selected'));
@@ -241,18 +269,49 @@ paymentOptions.forEach(button => {
         selectedPaymentMethod = button.dataset.method;
         selectedPaymentDisplay.innerText = selectedPaymentMethod;
         confirmSaleBtn.disabled = false;
+
+        // MOSTRAR A ÁREA DE DESCONTO AGORA
+        if(discountSection) {
+            discountSection.classList.remove('hidden');
+            // Recalcula para garantir que o total final apareça
+            calcularTotalComDesconto();
+        }
     });
 });
 
-// 6. Confirmar Venda
+// Listener do Input de Desconto (Apenas Porcentagem)
+if (discountInput) {
+    discountInput.addEventListener('input', (e) => {
+        let valor = parseFloat(e.target.value);
+        if (isNaN(valor)) valor = 0;
+        
+        // Trava entre 0 e 100%
+        if (valor < 0) valor = 0;
+        if (valor > 100) valor = 100;
+        
+        percentualDesconto = valor;
+        calcularTotalComDesconto();
+    });
+}
+
+// 6. Confirmar Venda (Envia os dados corretos)
 if (confirmSaleBtn) {
     confirmSaleBtn.addEventListener('click', async () => {
+        const totalOriginal = pedidoAtual.reduce((sum, item) => sum + item.price, 0);
+        
+        // Recalcula o final para garantir integridade
+        const valorDoDesconto = totalOriginal * (percentualDesconto / 100);
+        const totalFinal = totalOriginal - valorDoDesconto;
+
         const saleData = {
             items: pedidoAtual,
-            total: pedidoAtual.reduce((sum, item) => sum + item.price, 0),
+            total: totalFinal,
+            discount: percentualDesconto, // Salva a % no banco
             paymentMethod: selectedPaymentMethod
         };
+
         const result = await window.api.finalizeSale(saleData);
+
         if (result.success) {
             showAlert('Venda realizada com sucesso!', 'Sucesso');
             pedidoAtual = [];
@@ -279,28 +338,24 @@ if (listaPedidoUl) {
 
 // 8. Logout (Lógica MODERNA)
 if (logoutBtn && logoutModal) {
-    // Quando clica no botão "Sair" da barra lateral
     logoutBtn.addEventListener('click', () => {
         logoutModal.classList.remove('hidden');
     });
 }
 
-// Listener para o botão "Cancelar" dentro do modal
 if (cancelLogoutBtn && logoutModal) {
     cancelLogoutBtn.addEventListener('click', () => {
-        logoutModal.classList.add('hidden'); // Apenas fecha o modal
+        logoutModal.classList.add('hidden');
     });
 }
 
-// Listener para o botão "Sim, Sair" dentro do modal
 if (confirmLogoutBtn && logoutModal) {
     confirmLogoutBtn.addEventListener('click', async () => {
-        logoutModal.classList.add('hidden'); // Fecha o modal
-        window.api.logout(); // Chama a função de logout real
+        logoutModal.classList.add('hidden');
+        window.api.logout();
     });
 }
 
-// Fechar o modal se clicar fora dele (no overlay escuro)
 if (logoutModal) {
     logoutModal.addEventListener('click', (e) => {
         if (e.target === logoutModal) {

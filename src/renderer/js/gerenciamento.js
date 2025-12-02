@@ -47,19 +47,41 @@ document.addEventListener('DOMContentLoaded', () => {
             group.salesList.forEach(sale => {
                 const dateString = sale.createdAt.replace(' ', 'T') + 'Z';
                 const dateObj = new Date(dateString);
-                
                 const saleTime = dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-                
-                // Se não tiver vendedor (vendas antigas), mostra traço
                 const vendedor = sale.sellerName ? sale.sellerName : '-';
+
+                // Calcula o Subtotal somando os preços originais dos itens
+                const subtotal = sale.items.reduce((acc, item) => acc + item.price, 0);
+                
+                // Calcula o valor economizado (Subtotal - Total Pago)
+                const valorDesconto = subtotal - sale.total;
+                const temDesconto = valorDesconto > 0.01; // Margem de segurança para float
+                // ----------------------
 
                 reportHtml += `
                     <div class="sale-record">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                            <strong>⏰ ${saleTime} &nbsp; | &nbsp; 👤 Vendido por: ${vendedor}</strong>
-                            <strong>R$ ${sale.total.toFixed(2)}</strong>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px;">
+                            
+                            <div>
+                                <strong>⏰ ${saleTime} &nbsp; | &nbsp; 👤 Vendido por: ${vendedor}</strong>
+                            </div>
+
+                            <div style="text-align: right;">
+                                ${temDesconto ? `
+                                    <div style="font-size: 0.9em; color: #666; text-decoration: line-through;">
+                                        Subtotal: R$ ${subtotal.toFixed(2)}
+                                    </div>
+                                    <div style="font-size: 0.9em; color: #d32f2f;">
+                                        Desconto: - R$ ${valorDesconto.toFixed(2)} (${sale.discount || 0}%)
+                                    </div>
+                                ` : ''}
+                                <div style="font-size: 1.1em; color: #2e7d32;">
+                                    <strong>Total: R$ ${sale.total.toFixed(2)}</strong>
+                                </div>
+                            </div>
+
                         </div>
-                        <ul style="margin-top: 0; padding-left: 20px; color: #666;">
+                        <ul style="margin-top: 5px; padding-left: 20px; color: #666; border-top: 1px dashed #eee; padding-top: 5px;">
                 `;
                 
                 sale.items.forEach(item => {
